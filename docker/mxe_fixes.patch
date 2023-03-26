@@ -1,0 +1,690 @@
+These patches are currently required to get a properly working
+MXE setup for sigrok usage.
+
+ - libsigrok currently requires a special libusb branch.
+
+ - Add an additional libusb RAW_IO patch in MXE directly, which obsoletes
+   the need to build a custom libusb in sigrok-cross-mingw.
+
+ - We're reverting to glib 2.44.1 for now since more recent
+   versions (e.g. 2.50.2) seem to have a bug. Details:
+   https://sigrok.org/bugzilla/show_bug.cgi?id=1232
+   https://github.com/mxe/mxe/issues/2168
+
+ - We're patching glib to fix various MinGW compiler warnings. Details:
+   https://sigrok.org/bugzilla/show_bug.cgi?id=986
+   https://gitlab.gnome.org/GNOME/glib/commit/3d7cde654c4c6f3bdad32f5521f28f5802a7c377
+
+ - Bump MXE's binutils to version 2.35, which added -mbig-obj support
+   for 32bit Windows (64bit was supported already). Required for PulseView.
+
+diff --git a/src/binutils-1-fixes.patch b/src/binutils-1-fixes.patch
+deleted file mode 100644
+index 357428fe..00000000
+--- a/src/binutils-1-fixes.patch
++++ /dev/null
+@@ -1,147 +0,0 @@
+-This file is part of MXE. See LICENSE.md for licensing information.
+-
+-Contains ad hoc patches for cross building.
+-
+-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+-From: Stephen Kitt <skitt@debian.org>
+-Date: Sat, 15 Jul 2017 00:09:40 +1000
+-Subject: [PATCH 1/1] Allow the PE timestamp to be specified with
+- SOURCE_DATE_EPOCH
+-
+-Taken from:
+-https://sources.debian.net/patches/binutils-mingw-w64/7.4/specify-timestamp.patch/
+-
+-diff --git a/bfd/peXXigen.c b/bfd/peXXigen.c
+-index 1111111..2222222 100644
+---- a/bfd/peXXigen.c
+-+++ b/bfd/peXXigen.c
+-@@ -70,6 +70,9 @@
+- #include <wctype.h>
+- #endif
+- 
+-+#include <errno.h>
+-+#include <limits.h>
+-+
+- /* NOTE: it's strange to be including an architecture specific header
+-    in what's supposed to be general (to PE/PEI) code.  However, that's
+-    where the definitions are, and they don't vary per architecture
+-@@ -878,10 +881,38 @@ _bfd_XXi_only_swap_filehdr_out (bfd * abfd, void * in, void * out)
+-   H_PUT_16 (abfd, filehdr_in->f_nscns, filehdr_out->f_nscns);
+- 
+-   /* Only use a real timestamp if the option was chosen.  */
+--  if ((pe_data (abfd)->insert_timestamp))
+--    H_PUT_32 (abfd, time (0), filehdr_out->f_timdat);
+--  else
+-+  if (pe_data (abfd)->insert_timestamp) {
+-+    time_t now;
+-+    char *source_date_epoch;
+-+    unsigned long long epoch;
+-+    char *endptr;
+-+
+-+    now = time(NULL);
+-+    source_date_epoch = getenv("SOURCE_DATE_EPOCH");
+-+    if (source_date_epoch) {
+-+      errno = 0;
+-+      epoch = strtoull(source_date_epoch, &endptr, 10);
+-+      if ((errno == ERANGE && (epoch == ULLONG_MAX || epoch == 0))
+-+          || (errno != 0 && epoch == 0)) {
+-+        _bfd_error_handler("Environment variable $SOURCE_DATE_EPOCH: strtoull: %s\n",
+-+                           strerror(errno));
+-+      } else if (endptr == source_date_epoch) {
+-+        _bfd_error_handler("Environment variable $SOURCE_DATE_EPOCH: No digits were found: %s\n",
+-+                           endptr);
+-+      } else if (*endptr != '\0') {
+-+        _bfd_error_handler("Environment variable $SOURCE_DATE_EPOCH: Trailing garbage: %s\n",
+-+                           endptr);
+-+      } else if (epoch > ULONG_MAX) {
+-+        _bfd_error_handler("Environment variable $SOURCE_DATE_EPOCH: value must be smaller than or equal to: %lu but was found to be: %llu\n",
+-+                           ULONG_MAX, epoch);
+-+      } else {
+-+        now = epoch;
+-+      }
+-+    }
+-+    H_PUT_32 (abfd, now, filehdr_out->f_timdat);
+-+  } else {
+-     H_PUT_32 (abfd, 0, filehdr_out->f_timdat);
+-+  }
+- 
+-   PUT_FILEHDR_SYMPTR (abfd, filehdr_in->f_symptr,
+- 		      filehdr_out->f_symptr);
+-diff --git a/ld/emultempl/pe.em b/ld/emultempl/pe.em
+-index 1111111..2222222 100644
+---- a/ld/emultempl/pe.em
+-+++ b/ld/emultempl/pe.em
+-@@ -305,7 +305,7 @@ gld${EMULATION_NAME}_add_options
+-      OPTION_USE_NUL_PREFIXED_IMPORT_TABLES},
+-     {"no-leading-underscore", no_argument, NULL, OPTION_NO_LEADING_UNDERSCORE},
+-     {"leading-underscore", no_argument, NULL, OPTION_LEADING_UNDERSCORE},
+--    {"insert-timestamp", no_argument, NULL, OPTION_INSERT_TIMESTAMP},
+-+    {"insert-timestamp", optional_argument, NULL, OPTION_INSERT_TIMESTAMP},
+-     {"no-insert-timestamp", no_argument, NULL, OPTION_NO_INSERT_TIMESTAMP},
+- #ifdef DLL_SUPPORT
+-     /* getopt allows abbreviations, so we do this to stop it
+-diff --git a/ld/emultempl/pep.em b/ld/emultempl/pep.em
+-index 1111111..2222222 100644
+---- a/ld/emultempl/pep.em
+-+++ b/ld/emultempl/pep.em
+-@@ -321,7 +321,7 @@ gld${EMULATION_NAME}_add_options
+-     {"no-bind", no_argument, NULL, OPTION_NO_BIND},
+-     {"wdmdriver", no_argument, NULL, OPTION_WDM_DRIVER},
+-     {"tsaware", no_argument, NULL, OPTION_TERMINAL_SERVER_AWARE},
+--    {"insert-timestamp", no_argument, NULL, OPTION_INSERT_TIMESTAMP},
+-+    {"insert-timestamp", optional_argument, NULL, OPTION_INSERT_TIMESTAMP},
+-     {"no-insert-timestamp", no_argument, NULL, OPTION_NO_INSERT_TIMESTAMP},
+-     {"build-id", optional_argument, NULL, OPTION_BUILD_ID},
+-     {NULL, no_argument, NULL, 0}
+-diff --git a/ld/pe-dll.c b/ld/pe-dll.c
+-index 1111111..2222222 100644
+---- a/ld/pe-dll.c
+-+++ b/ld/pe-dll.c
+-@@ -26,6 +26,8 @@
+- #include "filenames.h"
+- #include "safe-ctype.h"
+- 
+-+#include <errno.h>
+-+#include <limits.h>
+- #include <time.h>
+- 
+- #include "ld.h"
+-@@ -1192,8 +1194,36 @@ fill_edata (bfd *abfd, struct bfd_link_info *info ATTRIBUTE_UNUSED)
+- 
+-   memset (edata_d, 0, edata_sz);
+- 
+--  if (pe_data (abfd)->insert_timestamp)
+--    H_PUT_32 (abfd, time (0), edata_d + 4);
+-+  if (pe_data (abfd)->insert_timestamp) {
+-+    time_t now;
+-+    char *source_date_epoch;
+-+    unsigned long long epoch;
+-+    char *endptr;
+-+
+-+    now = time(NULL);
+-+    source_date_epoch = getenv("SOURCE_DATE_EPOCH");
+-+    if (source_date_epoch) {
+-+      errno = 0;
+-+      epoch = strtoull(source_date_epoch, &endptr, 10);
+-+      if ((errno == ERANGE && (epoch == ULLONG_MAX || epoch == 0))
+-+	  || (errno != 0 && epoch == 0)) {
+-+	einfo("Environment variable $SOURCE_DATE_EPOCH: strtoull: %s\n",
+-+	      strerror(errno));
+-+      } else if (endptr == source_date_epoch) {
+-+	einfo("Environment variable $SOURCE_DATE_EPOCH: No digits were found: %s\n",
+-+	      endptr);
+-+      } else if (*endptr != '\0') {
+-+	einfo("Environment variable $SOURCE_DATE_EPOCH: Trailing garbage: %s\n",
+-+	      endptr);
+-+      } else if (epoch > ULONG_MAX) {
+-+	einfo("Environment variable $SOURCE_DATE_EPOCH: value must be smaller than or equal to: %lu but was found to be: %llu\n",
+-+	      ULONG_MAX, epoch);
+-+      } else {
+-+	now = epoch;
+-+      }
+-+    }
+-+    H_PUT_32 (abfd, now, edata_d + 4);
+-+  }
+- 
+-   if (pe_def_file->version_major != -1)
+-     {
+diff --git a/src/binutils.mk b/src/binutils.mk
+index 9721b581..8eab8bf3 100644
+--- a/src/binutils.mk
++++ b/src/binutils.mk
+@@ -3,8 +3,8 @@
+ PKG             := binutils
+ $(PKG)_WEBSITE  := https://www.gnu.org/software/binutils/
+ $(PKG)_DESCR    := GNU Binutils
+-$(PKG)_VERSION  := 2.28
+-$(PKG)_CHECKSUM := 6297433ee120b11b4b0a1c8f3512d7d73501753142ab9e2daa13c5a3edd32a72
++$(PKG)_VERSION  := 2.35
++$(PKG)_CHECKSUM := 7d24660f87093670738e58bcc7b7b06f121c0fcb0ca8fc44368d675a5ef9cff7
+ $(PKG)_SUBDIR   := binutils-$($(PKG)_VERSION)
+ $(PKG)_FILE     := binutils-$($(PKG)_VERSION).tar.bz2
+ $(PKG)_URL      := https://ftp.gnu.org/gnu/binutils/$($(PKG)_FILE)
+diff --git a/src/libusb1.mk b/src/libusb1.mk
+index ab01bf69..53aed36e 100644
+--- a/src/libusb1.mk
++++ b/src/libusb1.mk
+@@ -4,11 +4,11 @@ PKG             := libusb1
+ $(PKG)_WEBSITE  := https://libusb.info/
+ $(PKG)_DESCR    := LibUsb-1.0
+ $(PKG)_IGNORE   :=
+-$(PKG)_VERSION  := 1.0.24
+-$(PKG)_CHECKSUM := 7efd2685f7b327326dcfb85cee426d9b871fd70e22caa15bb68d595ce2a2b12a
+-$(PKG)_SUBDIR   := libusb-$($(PKG)_VERSION)
+-$(PKG)_FILE     := libusb-$($(PKG)_VERSION).tar.bz2
+-$(PKG)_URL      := https://$(SOURCEFORGE_MIRROR)/project/libusb/libusb-1.0/libusb-$($(PKG)_VERSION)/$($(PKG)_FILE)
++$(PKG)_VERSION  := 1.0.20-rc3-event-abstraction-v4
++$(PKG)_CHECKSUM := 58fee7f3f05fda209d14c55763df36ab86028bd9ab82c9bb74f1d5ab3208bcfd
++$(PKG)_SUBDIR   := libusb-event-abstraction-v4
++$(PKG)_FILE     := libusb-event-abstraction-v4.zip
++$(PKG)_URL      := https://github.com/uwehermann/libusb/archive/event-abstraction-v4.zip
+ $(PKG)_DEPS     := cc
+ 
+ define $(PKG)_UPDATE
+@@ -19,7 +19,7 @@ define $(PKG)_UPDATE
+ endef
+ 
+ define $(PKG)_BUILD
+-    cd '$(1)' && ./configure \
++    cd '$(1)' && autoreconf -i && ./configure \
+         $(MXE_CONFIGURE_OPTS) \
+         CFLAGS=-D_WIN32_WINNT=0x0500
+     $(MAKE) -C '$(1)' -j '$(JOBS)' install
+diff --git a/src/libusb1-1-fixes.patch b/src/libusb1-1-fixes.patch
+new file mode 100644
+index 00000000..6cdeb0c4
+--- /dev/null
++++ b/src/libusb1-1-fixes.patch
+@@ -0,0 +1,31 @@
++From d4f7a49d77bd8f4ac871a999fc9ec898cb22b8c3 Mon Sep 17 00:00:00 2001
++From: Vlad Ivanov <vlad-mbx@ya.ru>
++Date: Tue, 9 Feb 2016 10:35:23 +0300
++Subject: [PATCH] windows_usb: enable RAW_IO policy by default
++
++libusb should set RAW_IO policy unconditionally because it
++implements the buffer management itself.
++
++Signed-off-by: Vlad Ivanov <vlad-mbx@ya.ru>
++---
++ libusb/os/windows_usb.c | 4 ++++
++ 1 file changed, 4 insertions(+)
++
++diff --git a/libusb/os/windows_usb.c b/libusb/os/windows_usb.c
++index 6640ad5..12fdab0 100644
++--- a/libusb/os/windows_usb.c
+++++ b/libusb/os/windows_usb.c
++@@ -2890,6 +2890,10 @@ static int winusbx_configure_endpoints(int sub_api, struct libusb_device_handle
++ 			AUTO_CLEAR_STALL, sizeof(UCHAR), &policy)) {
++ 			usbi_dbg("failed to enable AUTO_CLEAR_STALL for endpoint %02X", endpoint_address);
++ 		}
+++		if (!WinUSBX[sub_api].SetPipePolicy(winusb_handle, endpoint_address,
+++			RAW_IO, sizeof(UCHAR), &policy)) {
+++			usbi_dbg("failed to enable RAW_IO for endpoint %02X", endpoint_address);
+++		}
++ 	}
++ 
++ 	return LIBUSB_SUCCESS;
++-- 
++2.5.0
++
+diff --git a/src/glib-1-fixes.patch b/src/glib-1-fixes.patch
+index 764ece9e..428cc6a9 100644
+--- a/src/glib-1-fixes.patch
++++ b/src/glib-1-fixes.patch
+@@ -5,7 +5,7 @@ Contains ad hoc patches for cross building.
+ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+ From: Mark Brand <mabrand@mabrand.nl>
+ Date: Thu, 23 Sep 2010 21:42:46 +0200
+-Subject: [PATCH 01/10] fix tool paths
++Subject: [PATCH] fix tool paths
+ 
+ 
+ diff --git a/glib-2.0.pc.in b/glib-2.0.pc.in
+@@ -29,17 +29,14 @@ index 1111111..2222222 100644
+ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+ From: Hans Petter Jansson <hpj@cl.no>
+ Date: Fri, 15 Jun 2012 15:25:01 +0200
+-Subject: [PATCH 02/10] Avoid DllMain symbol conflict when linking statically
++Subject: [PATCH] Avoid DllMain symbol conflict when linking statically
+ 
+-Adjusted by Boris Nagaev on 29-Jan-2017 to fix
+-https://gist.github.com/starius/f4fc85939352cb50122ba29e0f5b140d
+-when updating to glib-2.50.2.
+ 
+ diff --git a/gio/giomodule.c b/gio/giomodule.c
+ index 1111111..2222222 100644
+ --- a/gio/giomodule.c
+ +++ b/gio/giomodule.c
+-@@ -928,14 +928,12 @@ extern GType g_cocoa_notification_backend_get_type (void);
++@@ -918,14 +918,12 @@ extern GType g_gtk_notification_backend_get_type (void);
+  
+  static HMODULE gio_dll = NULL;
+  
+@@ -56,7 +53,7 @@ index 1111111..2222222 100644
+  	 DWORD     fdwReason,
+  	 LPVOID    lpvReserved)
+  {
+-@@ -945,8 +943,6 @@ DllMain (HINSTANCE hinstDLL,
++@@ -935,8 +933,6 @@ DllMain (HINSTANCE hinstDLL,
+    return TRUE;
+  }
+  
+@@ -69,7 +66,7 @@ diff --git a/glib/glib-init.c b/glib/glib-init.c
+ index 1111111..2222222 100644
+ --- a/glib/glib-init.c
+ +++ b/glib/glib-init.c
+-@@ -245,14 +245,14 @@ glib_init (void)
++@@ -237,14 +237,14 @@ glib_init (void)
+  
+  #if defined (G_OS_WIN32)
+  
+@@ -86,31 +83,18 @@ index 1111111..2222222 100644
+           DWORD     fdwReason,
+           LPVOID    lpvReserved)
+  {
+-diff --git a/gobject/gtype.c b/gobject/gtype.c
+-index 1111111..2222222 100644
+---- a/gobject/gtype.c
+-+++ b/gobject/gtype.c
+-@@ -4450,7 +4450,7 @@ gobject_init (void)
+-   _g_signal_init ();
+- }
+- 
+--#if defined (G_OS_WIN32)
+-+#if 0
+- 
+- BOOL WINAPI DllMain (HINSTANCE hinstDLL,
+-                      DWORD     fdwReason,
+ 
+ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+ From: Hans Petter Jansson <hpj@cl.no>
+ Date: Fri, 15 Jun 2012 15:27:22 +0200
+-Subject: [PATCH 03/10] Allow building without inotify support
++Subject: [PATCH] Allow building without inotify support
+ 
+ 
+ diff --git a/configure.ac b/configure.ac
+ index 1111111..2222222 100644
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -1599,10 +1599,16 @@ dnl *****************************
++@@ -1659,10 +1659,16 @@ dnl *****************************
+  dnl ** Check for inotify (GIO) **
+  dnl *****************************
+  inotify_support=no
+@@ -131,7 +115,7 @@ index 1111111..2222222 100644
+ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+ From: Hans Petter Jansson <hpj@cl.no>
+ Date: Fri, 15 Jun 2012 15:28:14 +0200
+-Subject: [PATCH 04/10] Make sure STDC_HEADERS is set for AC_CHECK_ALIGNOF.
++Subject: [PATCH] Make sure STDC_HEADERS is set for AC_CHECK_ALIGNOF.
+  Backported from upstream
+ 
+ 
+@@ -139,7 +123,7 @@ diff --git a/configure.ac b/configure.ac
+ index 1111111..2222222 100644
+ --- a/configure.ac
+ +++ b/configure.ac
+-@@ -511,6 +511,8 @@ LT_INIT([disable-static win32-dll])
++@@ -499,6 +499,8 @@ LT_INIT([disable-static win32-dll])
+  dnl when using libtool 2.x create libtool early, because it's used in configure
+  m4_ifdef([LT_OUTPUT], [LT_OUTPUT])
+  
+@@ -152,7 +136,7 @@ index 1111111..2222222 100644
+ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+ From: Hans Petter Jansson <hpj@cl.no>
+ Date: Fri, 15 Jun 2012 15:29:06 +0200
+-Subject: [PATCH 05/10] Link with dnsapi
++Subject: [PATCH] Link with dnsapi
+ 
+ 
+ diff --git a/gio-2.0.pc.in b/gio-2.0.pc.in
+@@ -171,15 +155,15 @@ index 1111111..2222222 100644
+ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+ From: Hans Petter Jansson <hpj@cl.no>
+ Date: Fri, 15 Jun 2012 15:29:38 +0200
+-Subject: [PATCH 06/10] Ensure globals are initialized even when DllMain is not
+- being run
++Subject: [PATCH] Ensure globals are initialized even when DllMain is not being
++ run
+ 
+ 
+ diff --git a/glib/gmain.c b/glib/gmain.c
+ index 1111111..2222222 100644
+ --- a/glib/gmain.c
+ +++ b/glib/gmain.c
+-@@ -2657,12 +2657,15 @@ g_get_real_time (void)
++@@ -2577,12 +2577,15 @@ g_get_real_time (void)
+  #if defined (G_OS_WIN32)
+  static ULONGLONG (*g_GetTickCount64) (void) = NULL;
+  static guint32 g_win32_tick_epoch = 0;
+@@ -195,7 +179,7 @@ index 1111111..2222222 100644
+    g_GetTickCount64 = NULL;
+    kernel32 = GetModuleHandle ("KERNEL32.DLL");
+    if (kernel32 != NULL)
+-@@ -2721,6 +2724,9 @@ g_get_monotonic_time (void)
++@@ -2641,6 +2644,9 @@ g_get_monotonic_time (void)
+     *    timeBeginPeriod() to increase it as much as they want
+     */
+  
+@@ -535,7 +519,7 @@ index 1111111..2222222 100644
+    win32_check_for_error (WAIT_FAILED != WaitForSingleObject (wt->handle, INFINITE));
+  }
+  
+-@@ -1041,6 +1145,8 @@ g_thread_lookup_native_funcs (void)
++@@ -984,6 +1088,8 @@ g_thread_lookup_native_funcs (void)
+  void
+  g_thread_win32_init (void)
+  {
+@@ -548,7 +532,7 @@ index 1111111..2222222 100644
+ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+ From: Gerardo Ballabio <gerardo.ballabio@gmail.com>
+ Date: Sun, 16 Aug 2015 13:18:24 +0200
+-Subject: [PATCH 07/10] Remove an annoying runtime warning
++Subject: [PATCH] Remove an annoying runtime warning
+ 
+ that pops up when using GtkApplication in Gtk+ 3 programs.
+ 
+@@ -556,7 +540,7 @@ diff --git a/gio/gdbusaddress.c b/gio/gdbusaddress.c
+ index 1111111..2222222 100644
+ --- a/gio/gdbusaddress.c
+ +++ b/gio/gdbusaddress.c
+-@@ -1387,6 +1387,7 @@ __declspec(dllexport) void CALLBACK g_win32_run_session_bus (HWND hwnd, HINSTANC
++@@ -1325,6 +1325,7 @@ __declspec(dllexport) void CALLBACK g_win32_run_session_bus (HWND hwnd, HINSTANC
+  __declspec(dllexport) void CALLBACK
+  g_win32_run_session_bus (HWND hwnd, HINSTANCE hinst, char *cmdline, int nCmdShow)
+  {
+@@ -564,7 +548,7 @@ index 1111111..2222222 100644
+    GDBusDaemon *daemon;
+    GMainLoop *loop;
+    const char *address;
+-@@ -1418,6 +1419,7 @@ g_win32_run_session_bus (HWND hwnd, HINSTANCE hinst, char *cmdline, int nCmdShow
++@@ -1354,6 +1355,7 @@ g_win32_run_session_bus (HWND hwnd, HINSTANCE hinst, char *cmdline, int nCmdShow
+  
+    g_main_loop_unref (loop);
+    g_object_unref (daemon);
+@@ -576,7 +560,7 @@ index 1111111..2222222 100644
+ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+ From: aquiles2k <aj@elane2k.com>
+ Date: Wed, 6 Apr 2016 22:39:53 +0300
+-Subject: [PATCH 08/10] fix error "won't overwrite defined macro" on OSX
++Subject: [PATCH] fix error "won't overwrite defined macro" on OSX
+ 
+ See https://github.com/mxe/mxe/issues/1281
+ 
+@@ -596,110 +580,22 @@ index 1111111..2222222 100644
+  dnl At the end, if we're not within glib, we'll define the public
+  dnl definitions in terms of our private definitions.
+ 
+-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+-From: Tony Theodore <tonyt@logyst.com>
+-Date: Mon, 26 Feb 2018 16:09:53 +1100
+-Subject: [PATCH 09/10] darwin: disable g_cocoa_notification_backend
+ 
++From: Boris Pek <tehnick-8@mail.ru>
++Date: Thu, 28 Apr 2016 16:48:12 +0300
++Subject: [PATCH] fix build with GCC >= 6.x
+ 
+-diff --git a/gio/Makefile.am b/gio/Makefile.am
+-index 1111111..2222222 100644
+---- a/gio/Makefile.am
+-+++ b/gio/Makefile.am
+-@@ -279,10 +279,6 @@ unix_sources = \
+- 
+- appinfo_sources += $(unix_appinfo_sources)
+- 
+--if OS_COCOA
+--unix_sources += gcocoanotificationbackend.c
+--endif
+--
+- giounixincludedir=$(includedir)/gio-unix-2.0/gio
+- giounixinclude_HEADERS = \
+- 	gdesktopappinfo.h	\
+-diff --git a/gio/giomodule.c b/gio/giomodule.c
+-index 1111111..2222222 100644
+---- a/gio/giomodule.c
+-+++ b/gio/giomodule.c
+-@@ -918,9 +918,6 @@ extern GType g_proxy_resolver_portal_get_type (void);
+- extern GType g_network_monitor_portal_get_type (void);
+- #endif
+- 
+--#ifdef HAVE_COCOA
+--extern GType g_cocoa_notification_backend_get_type (void);
+--#endif
++See plugins/gcc6/README.md
++
++diff --git a/gio/gregistrysettingsbackend.c b/gio/gregistrysettingsbackend.c
++--- a/gio/gregistrysettingsbackend.c
+++++ b/gio/gregistrysettingsbackend.c
++@@ -228,7 +228,7 @@
++   if (result_code == ERROR_KEY_DELETED)
++     trace ("(%s)", win32_message);
++   else
++-    g_message (win32_message);
+++    g_message ("%s", win32_message);
++ };
+  
+- #ifdef G_PLATFORM_WIN32
+  
+-@@ -1117,9 +1114,6 @@ _g_io_modules_ensure_loaded (void)
+-       g_type_ensure (g_network_monitor_portal_get_type ());
+-       g_type_ensure (g_proxy_resolver_portal_get_type ());
+- #endif
+--#ifdef HAVE_COCOA
+--      g_type_ensure (g_cocoa_notification_backend_get_type ());
+--#endif
+- #ifdef G_OS_WIN32
+-       g_type_ensure (_g_winhttp_vfs_get_type ());
+- #endif
+-
+-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+-From: Ernestas Kulik <ekulik@redhat.com>
+-Date: Tue, 29 Jan 2019 09:50:46 +0100
+-Subject: [PATCH 10/10] gdbus: Avoid printing null strings
+-
+-This mostly affects the 2.56 branch, but, given that GCC 9 is being
+-stricter about passing null string pointers to printf-like functions, it
+-might make sense to proactively fix such calls.
+-
+-gdbusauth.c: In function '_g_dbus_auth_run_server':
+-gdbusauth.c:1302:11: error: '%s' directive argument is null
+-[-Werror=format-overflow=]
+- 1302 |           debug_print ("SERVER: WaitingForBegin, read '%s'",
+- line);
+-       |
+-
+-gdbusmessage.c: In function ‘g_dbus_message_to_blob’:
+-gdbusmessage.c:2730:30: error: ‘%s’ directive argument is null [-Werror=format-overflow=]
+- 2730 |       tupled_signature_str = g_strdup_printf ("(%s)", signature_str);
+-      |
+-
+-diff --git a/gio/gdbusauth.c b/gio/gdbusauth.c
+-index 1111111..2222222 100644
+---- a/gio/gdbusauth.c
+-+++ b/gio/gdbusauth.c
+-@@ -1295,9 +1295,9 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
+-                                                     &line_length,
+-                                                     cancellable,
+-                                                     error);
+--          debug_print ("SERVER: WaitingForBegin, read '%s'", line);
+-           if (line == NULL)
+-             goto out;
+-+          debug_print ("SERVER: WaitingForBegin, read '%s'", line);
+-           if (g_strcmp0 (line, "BEGIN") == 0)
+-             {
+-               /* YAY, done! */
+-diff --git a/gio/gdbusmessage.c b/gio/gdbusmessage.c
+-index 1111111..2222222 100644
+---- a/gio/gdbusmessage.c
+-+++ b/gio/gdbusmessage.c
+-@@ -2695,7 +2695,6 @@ g_dbus_message_to_blob (GDBusMessage          *message,
+-   if (message->body != NULL)
+-     {
+-       gchar *tupled_signature_str;
+--      tupled_signature_str = g_strdup_printf ("(%s)", signature_str);
+-       if (signature == NULL)
+-         {
+-           g_set_error (error,
+-@@ -2703,10 +2702,10 @@ g_dbus_message_to_blob (GDBusMessage          *message,
+-                        G_IO_ERROR_INVALID_ARGUMENT,
+-                        _("Message body has signature '%s' but there is no signature header"),
+-                        signature_str);
+--          g_free (tupled_signature_str);
+-           goto out;
+-         }
+--      else if (g_strcmp0 (tupled_signature_str, g_variant_get_type_string (message->body)) != 0)
+-+      tupled_signature_str = g_strdup_printf ("(%s)", signature_str);
+-+      if (g_strcmp0 (tupled_signature_str, g_variant_get_type_string (message->body)) != 0)
+-         {
+-           g_set_error (error,
+-                        G_IO_ERROR,
+diff --git a/src/glib-2-format.patch b/src/glib-2-format.patch
+new file mode 100644
+index 00000000..3d594af0
+--- /dev/null
++++ b/src/glib-2-format.patch
+@@ -0,0 +1,77 @@
++--- a/configure.ac.orig	2018-10-03 16:23:45.065890113 +0200
+++++ b/configure.ac	2018-10-03 16:28:04.378188119 +0200
++@@ -562,7 +562,7 @@ AS_IF([test x$glib_native_win32 != xyes
++ 	# long long is a 64 bit integer.
++ 	AC_MSG_CHECKING(for format to printf and scanf a guint64)
++ 	AC_CACHE_VAL(glib_cv_long_long_format,[
++-		for format in ll q I64; do
+++		for format in ll q; do
++ 		  AC_TRY_RUN([#include <stdio.h>  
++ 			int main()
++ 			{
++@@ -588,7 +588,7 @@ AS_IF([test x$glib_native_win32 != xyes
++ 	# __int64 is a 64 bit integer.
++ 	AC_MSG_CHECKING(for format to printf and scanf a guint64)
++ 	# We know this is MSVCRT.DLL, and what the formats are
++-	glib_cv_long_long_format=I64
+++	glib_cv_long_long_format=ll
++ 	AC_MSG_RESULT(%${glib_cv_long_long_format}u)
++         AC_DEFINE(HAVE_LONG_LONG_FORMAT,1,[define if system printf can print long long])
++ 	AC_DEFINE(HAVE_INT64_AND_I64,1,[define to support printing 64-bit integers with format I64])
++@@ -3176,8 +3176,8 @@ $ac_cv_sizeof___int64)
++     guint64_format='"'$glib_cv_long_long_format'u"'
++   fi
++   glib_extension=
++-  gint64_constant='(val##i64)'
++-  guint64_constant='(val##ui64)'
+++  gint64_constant='(val##ll)'
+++  guint64_constant='(val##ull)'
++   ;;
++ esac
++ glib_size_t=$ac_cv_sizeof_size_t
++@@ -3204,8 +3204,8 @@ long)
++   glib_msize_type='LONG'
++   ;;
++ "long long"|__int64)
++-  gsize_modifier='"I64"'
++-  gsize_format='"I64u"'
+++  gsize_modifier='"ll"'
+++  gsize_format='"llu"'
++   glib_msize_type='INT64'
++   ;;
++ esac
++@@ -3227,8 +3227,8 @@ long)
++   glib_mssize_type='LONG'
++   ;;
++ "long long"|__int64)
++-  gssize_modifier='"I64"'
++-  gssize_format='"I64i"'
+++  gssize_modifier='"ll"'
+++  gssize_format='"lli"'
++   glib_mssize_type='INT64'
++   ;;
++ esac
++@@ -3257,17 +3257,17 @@ $ac_cv_sizeof_long)
++   ;;
++ $ac_cv_sizeof_long_long)
++   glib_intptr_type_define='long long'
++-  gintptr_modifier='"I64"'
++-  gintptr_format='"I64i"'
++-  guintptr_format='"I64u"'
+++  gintptr_modifier='"ll"'
+++  gintptr_format='"lli"'
+++  guintptr_format='"llu"'
++   glib_gpi_cast='(gint64)'
++   glib_gpui_cast='(guint64)'
++   ;;
++ $ac_cv_sizeof___int64)
++   glib_intptr_type_define=__int64
++-  gintptr_modifier='"I64"'
++-  gintptr_format='"I64i"'
++-  guintptr_format='"I64u"'
+++  gintptr_modifier='"ll"'
+++  gintptr_format='"lli"'
+++  guintptr_format='"llu"'
++   glib_gpi_cast='(gint64)'
++   glib_gpui_cast='(guint64)'
++   ;;
+diff --git a/src/glib.mk b/src/glib.mk
+index 825b86bb..499a45b8 100644
+--- a/src/glib.mk
++++ b/src/glib.mk
+@@ -3,9 +3,9 @@
+ PKG             := glib
+ $(PKG)_WEBSITE  := https://gtk.org/
+ $(PKG)_DESCR    := GLib
+-$(PKG)_IGNORE   :=
+-$(PKG)_VERSION  := 2.50.2
+-$(PKG)_CHECKSUM := be68737c1f268c05493e503b3b654d2b7f43d7d0b8c5556f7e4651b870acfbf5
++$(PKG)_IGNORE   := 
++$(PKG)_VERSION  := 2.44.1
++$(PKG)_CHECKSUM := 8811deacaf8a503d0a9b701777ea079ca6a4277be10e3d730d2112735d5eca07
+ $(PKG)_SUBDIR   := glib-$($(PKG)_VERSION)
+ $(PKG)_FILE     := glib-$($(PKG)_VERSION).tar.xz
+ $(PKG)_URL      := https://download.gnome.org/sources/glib/$(call SHORT_PKG_VERSION,$(PKG))/$($(PKG)_FILE)
+@@ -27,6 +27,7 @@ define $(PKG)_BUILD_DARWIN
+     cd '$(BUILD_DIR)' && '$(SOURCE_DIR)/configure' \
+         $(MXE_CONFIGURE_OPTS) \
+         --enable-regex \
++	--disable-compile-warnings \
+         --disable-threads \
+         --disable-selinux \
+         --disable-inotify \
+@@ -55,6 +56,7 @@ define $(PKG)_BUILD_NATIVE
+     cd '$(SOURCE_DIR)' && NOCONFIGURE=true ./autogen.sh
+     cd '$(BUILD_DIR)' && '$(SOURCE_DIR)/configure' \
+         $(MXE_CONFIGURE_OPTS) \
++	--disable-compile-warnings \
+         --enable-regex \
+         --disable-threads \
+         --disable-selinux \
+@@ -97,6 +99,7 @@ define $(PKG)_BUILD
+     cd '$(SOURCE_DIR)' && NOCONFIGURE=true ./autogen.sh
+     cd '$(BUILD_DIR)' && '$(SOURCE_DIR)/configure' \
+         $(MXE_CONFIGURE_OPTS) \
++	--disable-compile-warnings \
+         --with-threads=win32 \
+         --with-pcre=system \
+         --with-libiconv=gnu \
