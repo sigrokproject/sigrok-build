@@ -118,3 +118,9 @@ cd sigrok-firmware
 make $PARALLEL $V
 make install $V
 cd ..
+
+# sigrok-dumps
+$GIT_CLONE $SIGROK_DUMPS_REPO sigrok-dumps
+cd sigrok-dumps
+make PREFIX="$INSTALL_DIR" install
+cd ..
