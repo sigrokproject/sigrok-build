@@ -110,3 +110,11 @@ make $PARALLEL $V
 make install $V
 cd ..
 
+# sigrok-firmware
+$GIT_CLONE $SIGROK_FIRMWARE_REPO sigrok-firmware
+cd sigrok-firmware
+./autogen.sh
+./configure $C $L
+make $PARALLEL $V
+make install $V
+cd ..

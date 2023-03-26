@@ -19,6 +19,8 @@ env:
   LIBSIGROK_BRANCH: "master"
   # Git URL for the libsigrokdecode dependency
   LIBSIGROKDECODE_REPO: "git://sigrok.org/libsigrokdecode"
+  # Git URL for the sigrok-firmware dependency
+  SIGROK_FIRMWARE_REPO: "git://sigrok.org/sigrok-firmware"
   # Build type for PulseView (Debug, Release, RelWithDebInfo, MinSizeRel)
   BUILD_TYPE: "Release"
   # Misc commands
