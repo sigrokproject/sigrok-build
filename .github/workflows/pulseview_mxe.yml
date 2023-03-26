@@ -98,7 +98,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: PulseView NSIS ${{ matrix.target.target }} installer
-          path: pulseview/build/contrib/PulseView*installer.exe
+          path: pulseview/build/contrib/pulseview*installer.exe
 
 
   publish:
@@ -128,5 +128,5 @@ jobs:
         run: |
             wget -q https://github.com/TheAssassin/pyuploadtool/releases/download/continuous/pyuploadtool-x86_64.AppImage
             chmod +x pyuploadtool-x86_64.AppImage
-            ./pyuploadtool-x86_64.AppImage **/PulseView-*.*
+            ./pyuploadtool-x86_64.AppImage **/pulseview-*.*
 
