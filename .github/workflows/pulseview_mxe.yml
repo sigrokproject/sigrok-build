@@ -1,0 +1,128 @@
+name: PulseView Build
+
+on:
+  push:
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  # The path where the compiled packages will be installed.
+  INSTALL_DIR: "${{ github.workspace }}/sr"
+  # Git URL for the libserialport dependency
+  LIBSERIALPORT_REPO: "git://sigrok.org/libserialport"
+  # Git URL for the libsigrok dependency
+  LIBSIGROK_REPO: "git://sigrok.org/libsigrok"
+  # Git branch for the libsigrok dependency
+  LIBSIGROK_BRANCH: "master"
+  # Git URL for the libsigrokdecode dependency
+  LIBSIGROKDECODE_REPO: "git://sigrok.org/libsigrokdecode"
+  # Build type for PulseView (Debug, Release, RelWithDebInfo, MinSizeRel)
+  BUILD_TYPE: "Release"
+  # Misc commands
+  WGET: "wget -c --quiet"
+  GIT_CLONE: "git clone --depth=1"
+
+jobs:
+
+  build_mxe:
+    name: PulseView MXE build (${{ matrix.target.target }})
+
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/knarfs/sigrok-mxe:latest
+
+    strategy:
+      matrix:
+        target:
+          - { target: "i686", nsis_param: "" }
+          - { target: "x86_64", nsis_param: "-DPE64=1" }
+
+    env:
+      TARGET: ${{ matrix.target.target }}
+      DEBUG: 0
+      # When downloading python from sigrok.org, smth is wrong with the cert
+      WGET: "wget -c --quiet --no-check-certificate"
+
+    steps:
+      - name: Checkout sigrok-build
+        uses: actions/checkout@v3
+        with:
+          path: sigrok-build
+
+      - name: Build dependencies
+        run: |
+          cd sigrok-build/ci
+          source sigrok-mxe-init-toolchain.sh
+          ./sigrok-mxe-build-dependencies.sh
+
+      - name: Checkout PulseView
+        uses: actions/checkout@v3
+        with:
+          # TODO: Clone from sigrok.org
+          repository: sigrokproject/pulseview
+          path: pulseview
+
+      - name: Build PulseView
+        run: |
+          source sigrok-build/ci/sigrok-mxe-init-toolchain.sh
+          mkdir -p pulseview/build
+          cd pulseview/build
+          $CMAKE \
+            -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_DIR \
+            -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+            -DDISABLE_WERROR=FALSE \
+            -DENABLE_TESTS=TRUE \
+            ..
+          make $PARALLEL $V
+          make install/strip $V
+
+      - name: Build NSIS installer
+        run: |
+          source sigrok-build/ci/sigrok-mxe-init-toolchain.sh
+
+          # Zadig (we ship this with frontends for easy driver switching).
+          $WGET https://github.com/pbatard/libwdi/releases/download/b721/zadig-2.4.exe -O $INSTALL_DIR/zadig.exe
+          $WGET https://github.com/pbatard/libwdi/releases/download/v1.2.5/zadig_xp-2.2.exe -O $INSTALL_DIR/zadig_xp.exe
+
+          cp sigrok-build/ci/contrib-mxe/FileAssociation.nsh pulseview/build/contrib
+          makensis ${{ matrix.target.nsis_param }} pulseview/build/contrib/pulseview_cross.nsi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: PulseView NSIS ${{ matrix.target.target }} installer
+          path: pulseview/build/contrib/PulseView*installer.exe
+
+
+  publish:
+    name: PulseView publish
+
+    runs-on: ubuntu-latest
+
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')
+    needs:
+      - build_mxe
+
+    steps:
+      - name: Install dependencies
+        run: |
+          # AppImage needs libfuse2 to start
+          sudo apt-get update
+          sudo apt-get install -y libfuse2
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+      - name: Inspect directory after downloading artifacts
+        run: ls -alFR
+      - name: Upload artifacts and create (continuous) release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+            wget -q https://github.com/TheAssassin/pyuploadtool/releases/download/continuous/pyuploadtool-x86_64.AppImage
+            chmod +x pyuploadtool-x86_64.AppImage
+            ./pyuploadtool-x86_64.AppImage **/PulseView-*.*
+
