@@ -121,14 +121,14 @@ cd ..
 
 # sigrok-firmware-fx2lafw
 
-$GIT_CLONE $SIGROK_FIRMWARE_FX2LAFW_REPO sigrok-firmware-fx2lafw
-cd sigrok-firmware-fx2lafw
-./autogen.sh
-# We're building the fx2lafw firmware on the host, no need to cross-compile.
-./configure --prefix="$INSTALL_DIR"
-make $PARALLEL $V
-make install $V
-cd ..
+# $GIT_CLONE $SIGROK_FIRMWARE_FX2LAFW_REPO sigrok-firmware-fx2lafw
+# cd sigrok-firmware-fx2lafw
+# ./autogen.sh
+# # We're building the fx2lafw firmware on the host, no need to cross-compile.
+# ./configure --prefix="$INSTALL_DIR"
+# make $PARALLEL $V
+# make install $V
+# cd ..
 
 # sigrok-dumps
 $GIT_CLONE $SIGROK_DUMPS_REPO sigrok-dumps
