@@ -1,5 +1,12 @@
 FROM debian:latest AS sigrok-mxe
-LABEL org.opencontainers.image.authors="Frank Stettner <frank-stettner@gmx.net>"
+LABEL \
+	org.opencontainers.image.title="sigrok MXE Build Image" \	
+	org.opencontainers.image.description="This image can be used to cross compile the sigrok artefacts for Windows with MXE" \
+	org.opencontainers.image.url="https://sigrok.org" \
+	org.opencontainers.image.source="https://github.com/knarfS/sigrok-build" \
+	org.opencontainers.image.licenses="GPL3" \
+	org.opencontainers.image.authors="Frank Stettner <frank-stettner@gmx.net>" \
+	maintainer="Frank Stettner <frank-stettner@gmx.net>"
 
 ENV BASE_DIR /opt
 ENV MXE_DIR $BASE_DIR/mxe
@@ -19,6 +26,7 @@ RUN apt-get update \
 		flex \
 		g++ \
 		g++-multilib \
+		sdcc \
 		gettext \
 		git \
 		gperf \
