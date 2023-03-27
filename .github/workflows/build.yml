@@ -1,4 +1,4 @@
-name: PulseView Build
+name: sigrok Artifacts Build
 
 on:
   push:
@@ -21,6 +21,8 @@ env:
   LIBSIGROKDECODE_REPO: "git://sigrok.org/libsigrokdecode"
   # Git URL for the sigrok-firmware dependency
   SIGROK_FIRMWARE_REPO: "git://sigrok.org/sigrok-firmware"
+  # Git URL for the sigrok-firmware-fx2lafw dependency
+  SIGROK_FIRMWARE_FX2LAFW_REPO: "git://sigrok.org/sigrok-firmware-fx2lafw"
   # Git URL for the sigrok-dumps dependency
   SIGROK_DUMPS_REPO: "git://sigrok.org/sigrok-dumps"
   # Build type for PulseView (Debug, Release, RelWithDebInfo, MinSizeRel)
@@ -31,7 +33,7 @@ env:
 
 jobs:
 
-  build_mxe:
+  build_pulseview_mxe:
     name: PulseView MXE build (${{ matrix.target.target }})
 
     runs-on: ubuntu-latest
@@ -102,8 +104,72 @@ jobs:
           path: pulseview/build/contrib/pulseview*installer.exe
 
 
+  build_sigrok-cli_mxe:
+    name: sigrok-cli MXE build (${{ matrix.target.target }})
+
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/knarfs/sigrok-mxe:latest
+
+    strategy:
+      matrix:
+        target:
+          - { target: "i686", nsis_param: "" }
+          - { target: "x86_64", nsis_param: "-DPE64=1" }
+
+    env:
+      TARGET: ${{ matrix.target.target }}
+      DEBUG: 0
+      # When downloading python from sigrok.org, smth is wrong with the cert
+      WGET: "wget -c --quiet --no-check-certificate"
+
+    steps:
+      - name: Checkout sigrok-build
+        uses: actions/checkout@v3
+        with:
+          path: sigrok-build
+
+      - name: Build dependencies
+        run: |
+          cd sigrok-build/ci
+          source sigrok-mxe-init-toolchain.sh
+          ./sigrok-mxe-build-dependencies.sh
+
+      - name: Checkout sigrok-cli
+        uses: actions/checkout@v3
+        with:
+          repository: sigrokproject/sigrok-cli
+          path: sigrok-cli
+
+      - name: Build sigrok-cli
+        run: |
+          source sigrok-build/ci/sigrok-mxe-init-toolchain.sh
+          cd sigrok-cli
+          ./autogen.sh
+          ./configure $C
+          make $PARALLEL $V
+          make install/strip $V
+
+      - name: Build NSIS installer
+        run: |
+          source sigrok-build/ci/sigrok-mxe-init-toolchain.sh
+
+          # Zadig (we ship this with frontends for easy driver switching).
+          $WGET https://github.com/pbatard/libwdi/releases/download/b721/zadig-2.4.exe -O $INSTALL_DIR/zadig.exe
+          $WGET https://github.com/pbatard/libwdi/releases/download/v1.2.5/zadig_xp-2.2.exe -O $INSTALL_DIR/zadig_xp.exe
+
+          cp sigrok-build/ci/contrib-mxe/FileAssociation.nsh pulseview/build/contrib
+          makensis ${{ matrix.target.nsis_param }} contrib/sigrok-cli_cross.nsi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: PulseView NSIS ${{ matrix.target.target }} installer
+          path: pulseview/build/contrib/sigrok-cli*installer.exe
+
+
   publish:
-    name: PulseView publish
+    name: sigrok artifacts publish
 
     runs-on: ubuntu-latest
 
@@ -111,7 +177,8 @@ jobs:
       (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')
     needs:
-      - build_mxe
+      - build_pulseview_mxe
+      - build_sigrok-cli_mxe
 
     steps:
       - name: Install dependencies
