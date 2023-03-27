@@ -68,9 +68,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           # TODO: Clone from sigrok.org
-          repository: knarfS/pulseview
+          repository: sigrokproject/pulseview
           path: pulseview
-          ref: github-ci
 
       - name: Build PulseView
         run: |
@@ -97,10 +96,15 @@ jobs:
           cp sigrok-build/ci/contrib-mxe/FileAssociation.nsh pulseview/build/contrib
           makensis ${{ matrix.target.nsis_param }} pulseview/build/contrib/pulseview_cross.nsi
 
+      - name: Rename artifact
+        run: |
+          cd pulseview/build/contrib
+          mv pulseview-*installer.exe pulseview-NIGHTLY-${{ matrix.target.target }}-static-$BUILD_TYPE-installer.exe
+
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: PulseView NSIS ${{ matrix.target.target }} installer
+          name: artifacts
           path: pulseview/build/contrib/pulseview*installer.exe
 
 
@@ -161,10 +165,15 @@ jobs:
           cp sigrok-build/ci/contrib-mxe/FileAssociation.nsh sigrok-cli/contrib
           makensis ${{ matrix.target.nsis_param }} sigrok-cli/contrib/sigrok-cli_cross.nsi
 
+      - name: Rename artifact
+        run: |
+          cd sigrok-cli/contrib
+          mv sigrok-cli-*installer.exe sigrok-cli-NIGHTLY-${{ matrix.target.target }}-static-$BUILD_TYPE-installer.exe
+
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: PulseView NSIS ${{ matrix.target.target }} installer
+          name: artifacts
           path: sigrok-cli/contrib/sigrok-cli*installer.exe
 
 
@@ -196,5 +205,5 @@ jobs:
         run: |
             wget -q https://github.com/TheAssassin/pyuploadtool/releases/download/continuous/pyuploadtool-x86_64.AppImage
             chmod +x pyuploadtool-x86_64.AppImage
-            ./pyuploadtool-x86_64.AppImage **/pulseview-*.*
+            ./pyuploadtool-x86_64.AppImage artifacts/*.*
 
