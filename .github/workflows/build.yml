@@ -165,7 +165,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: PulseView NSIS ${{ matrix.target.target }} installer
-          path: pulseview/build/contrib/sigrok-cli*installer.exe
+          path: sigrok-cli/contrib/sigrok-cli*installer.exe
 
 
   publish:
