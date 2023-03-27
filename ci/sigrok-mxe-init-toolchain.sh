@@ -34,6 +34,7 @@ P="$INSTALL_DIR/lib/pkgconfig"
 P2="$MXE_DIR/usr/$TOOLCHAIN_TRIPLET/lib/pkgconfig"
 export C="--host=$TOOLCHAIN_TRIPLET --prefix=$INSTALL_DIR CPPFLAGS=-D__printf__=__gnu_printf__"
 export L="--disable-shared --enable-static"
+#export V="V=1 VERBOSE=1"
 
 if [ "$TARGET" = "i686" ]; then
 	export PKG_CONFIG_PATH_i686_w64_mingw32_static_posix="$P:$P2"
