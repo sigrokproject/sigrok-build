@@ -148,7 +148,7 @@ jobs:
           ./autogen.sh
           ./configure $C
           make $PARALLEL $V
-          make install/strip $V
+          make install $V
 
       - name: Build NSIS installer
         run: |
