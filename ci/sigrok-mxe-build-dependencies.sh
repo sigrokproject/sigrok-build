@@ -28,13 +28,13 @@ mkdir -p $BUILD_DIR
 cd $BUILD_DIR
 
 # Cross-compiling Python is highly non-trivial, so we avoid it for now.
-# The download below is a repackaged tarball of the official Python 3.4.4 MSI
-# installer for Windows:
+# The Python32.tar.gz file below is a repackaged tarball of the official
+# Python 3.4.4 MSI installer for Windows:
 #   - https://www.python.org/ftp/python/3.4.4/python-3.4.4.msi
 #   - https://www.python.org/ftp/python/3.4.4/python-3.4.4.amd64.msi
 # The MSI file has been installed on a Windows box and then c:\Python34\libs
 # and c:\Python34\include have been stored in the Python34_*.tar.gz tarball.
-$WGET https://sigrok.org/tmp/Python34_$TARGET.tar.gz -O "$INSTALL_DIR"/Python34.tar.gz
+cp ../contrib-mxe/Python34_$TARGET.tar.gz "$INSTALL_DIR"/Python34.tar.gz
 tar xzf "$INSTALL_DIR"/Python34.tar.gz -C "$INSTALL_DIR"
 
 # Fix for bug #1195.
@@ -57,14 +57,14 @@ Cflags: -I\${includedir}
 EOF
 
 # The python34.dll and python34.zip files will be shipped in the NSIS
-# Windows installers (required for SmuView Python scripts to work).
+# Windows installers (required for PulseView/SmuView Python scripts to work).
 # The file python34.dll (NOT the same as python3.dll) is copied from an
 # installed Python 3.4.4 (see above) from c:\Windows\system32\python34.dll.
 # The file python34.zip contains all files from the 'DLLs', 'Lib', and 'libs'
 # subdirectories from an installed Python on Windows (c:\python34), i.e. some
 # libraries and all Python stdlib modules.
-$WGET https://sigrok.org/tmp/python34_$TARGET.dll -O "$INSTALL_DIR"/python34.dll
-$WGET https://sigrok.org/tmp/python34_$TARGET.zip -O "$INSTALL_DIR"/python34.zip
+cp ../contrib-mxe/python34_$TARGET.dll "$INSTALL_DIR"/python34.dll
+cp ../contrib-mxe/python34_$TARGET.zip "$INSTALL_DIR"/python34.zip
 
 # In order to link against Python we need libpython34.a.
 # The upstream Python 32bit installer ships this, the x86_64 installer
