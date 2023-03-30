@@ -60,7 +60,7 @@ jobs:
 
       - name: Build dependencies
         run: |
-          cd sigrok-build/ci
+          cd sigrok-build/ci/mxe
           source sigrok-mxe-init-toolchain.sh
           ./sigrok-mxe-build-dependencies.sh
 
@@ -73,7 +73,7 @@ jobs:
 
       - name: Build PulseView
         run: |
-          source sigrok-build/ci/sigrok-mxe-init-toolchain.sh
+          source sigrok-build/ci/mxe/sigrok-mxe-init-toolchain.sh
           mkdir -p pulseview/build
           cd pulseview/build
           $CMAKE \
@@ -87,13 +87,13 @@ jobs:
 
       - name: Build NSIS installer
         run: |
-          source sigrok-build/ci/sigrok-mxe-init-toolchain.sh
+          source sigrok-build/ci/mxe/sigrok-mxe-init-toolchain.sh
 
           # Zadig (we ship this with frontends for easy driver switching).
           $WGET https://github.com/pbatard/libwdi/releases/download/b721/zadig-2.4.exe -O $INSTALL_DIR/zadig.exe
           $WGET https://github.com/pbatard/libwdi/releases/download/v1.2.5/zadig_xp-2.2.exe -O $INSTALL_DIR/zadig_xp.exe
 
-          cp sigrok-build/ci/contrib-mxe/FileAssociation.nsh pulseview/build/contrib
+          cp sigrok-build/ci/mxe/contrib-mxe/FileAssociation.nsh pulseview/build/contrib
           makensis ${{ matrix.target.nsis_param }} pulseview/build/contrib/pulseview_cross.nsi
 
       - name: Rename artifact
@@ -135,7 +135,7 @@ jobs:
 
       - name: Build dependencies
         run: |
-          cd sigrok-build/ci
+          cd sigrok-build/ci/mxe
           source sigrok-mxe-init-toolchain.sh
           ./sigrok-mxe-build-dependencies.sh
 
@@ -147,7 +147,7 @@ jobs:
 
       - name: Build sigrok-cli
         run: |
-          source sigrok-build/ci/sigrok-mxe-init-toolchain.sh
+          source sigrok-build/ci/mxe/sigrok-mxe-init-toolchain.sh
           cd sigrok-cli
           ./autogen.sh
           ./configure $C
@@ -156,13 +156,13 @@ jobs:
 
       - name: Build NSIS installer
         run: |
-          source sigrok-build/ci/sigrok-mxe-init-toolchain.sh
+          source sigrok-build/ci/mxe/sigrok-mxe-init-toolchain.sh
 
           # Zadig (we ship this with frontends for easy driver switching).
           $WGET https://github.com/pbatard/libwdi/releases/download/b721/zadig-2.4.exe -O $INSTALL_DIR/zadig.exe
           $WGET https://github.com/pbatard/libwdi/releases/download/v1.2.5/zadig_xp-2.2.exe -O $INSTALL_DIR/zadig_xp.exe
 
-          cp sigrok-build/ci/contrib-mxe/FileAssociation.nsh sigrok-cli/contrib
+          cp sigrok-build/ci/mxe/contrib-mxe/FileAssociation.nsh sigrok-cli/contrib
           makensis ${{ matrix.target.nsis_param }} sigrok-cli/contrib/sigrok-cli_cross.nsi
 
       - name: Rename artifact
