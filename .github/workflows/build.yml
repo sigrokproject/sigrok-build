@@ -176,7 +176,97 @@ jobs:
           name: artifacts
           path: sigrok-cli/contrib/sigrok-cli*installer.exe
 
- 
+
+  build_pulseview_appimage:
+    name: PulseView AppImage build (${{ matrix.target.target }})
+
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/knarfs/sigrok-appimage-${{ matrix.target.container }}:latest
+
+    strategy:
+      matrix:
+        target:
+          # - target: "i386"
+          #   container: "x86_64-i386"
+          #   cc: "gcc -m32"
+          #   cxx: "g++ -m32"
+          #   ld: "ld -melf_i386"
+          #   ldflags: "-m32"
+          - target: "x86_64"
+            container: "x86_64"
+            cc: "gcc"
+            cxx: "g++"
+            ld: "ld"
+            ldflags: ""
+
+    env:
+      TARGET: ${{ matrix.target.target }}
+      CC: ${{ matrix.target.cc }}
+      CXX: ${{ matrix.target.cxx }}
+      LD: ${{ matrix.target.ld }}
+      LDFLAGS: ${{ matrix.target.ldflags }}
+      APP_DIR: "${{ github.workspace }}/AppDir"
+      # Artifact infos
+      ARTIFACT_TITLE: "PulseView"
+      ARTIFACT_BIN_NAME: "pulseview"
+      ARTIFACT_VERSION: "NIGHTLY"
+
+    steps:
+      - name: Update dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          # Temp!
+          sudo apt-get install -y python3.6-dev
+          # Temp!
+          sudo apt-get install -y libboost-system1.65-dev libboost-filesystem1.65-dev libboost-serialization1.65-dev
+
+      - name: Checkout sigrok-build
+        uses: actions/checkout@v3
+        with:
+          path: sigrok-build
+
+      - name: Build dependencies
+        run: |
+          cd sigrok-build/ci/appimage
+          source sigrok-appimage-init-toolchain.sh
+          ./sigrok-appimage-build-dependencies.sh
+
+      - name: Checkout PulseView
+        uses: actions/checkout@v3
+        with:
+          repository: sigrokproject/pulseview
+          path: pulseview
+
+      - name: Build PulseView
+        run: |
+          source sigrok-build/ci/appimage/sigrok-appimage-init-toolchain.sh
+          mkdir -p "$APP_DIR"
+          mkdir -p pulseview/build
+          cd pulseview/build
+          PKG_CONFIG_PATH=$P cmake \
+            -DCMAKE_INSTALL_PREFIX:PATH="$APP_DIR"/usr \
+            -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+            -DDISABLE_WERROR=FALSE \
+            -DENABLE_TESTS=FALSE \
+            ..
+          make $PARALLEL $V
+          make install/strip $V
+
+      - name: Build AppImage
+        run: |
+          cd sigrok-build/ci/appimage
+          source sigrok-appimage-init-toolchain.sh
+          ./sigrok-appimage-create-appimage.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: sigrok-build/ci/appimage/appimage-build/PulseView-*.AppImage
+
+
   build_pulseview_macos:
     name: PulseView macOS build
 
@@ -319,6 +409,7 @@ jobs:
     needs:
       - build_pulseview_mxe
       - build_sigrok-cli_mxe
+      - build_pulseview_appimage
       - build_pulseview_macos
       - build_sigrok-cli_macos
 
