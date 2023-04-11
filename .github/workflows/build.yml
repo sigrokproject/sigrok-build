@@ -177,6 +177,74 @@ jobs:
           path: sigrok-cli/contrib/sigrok-cli*installer.exe
 
 
+  build_pulseview_macos:
+    name: PulseView macOS build
+
+    runs-on: macos-11
+
+    env:
+      TARGET: "x86"
+      # We use Homebrew Qt 5.15.x (current)
+      BREW_QT_VERSION: "qt@5"
+      # We use Homebrew Python 3.x (current)
+      BREW_PYTHON_VERSION: "python@3"
+      # Artifact infos
+      ARTIFACT_TITLE: "PulseView"
+      ARTIFACT_BIN_NAME: "pulseview"
+      ARTIFACT_VERSION: "NIGHTLY"
+
+    steps:
+      - name: Install dependencies
+        run: |
+          brew install autoconf automake autoconf-archive pkg-config sdcc \
+            libtool libzip libusb libftdi hidapi nettle check doxygen swig \
+            glib glibmm@2.66 cmake boost "$BREW_PYTHON_VERSION" "$BREW_QT_VERSION"
+
+      - name: Checkout sigrok-build
+        uses: actions/checkout@v3
+        with:
+          path: sigrok-build
+
+      - name: Build dependencies
+        run: |
+          cd sigrok-build/ci/macos
+          source sigrok-macos-init-toolchain.sh
+          ./sigrok-macos-build-dependencies.sh
+
+      - name: Checkout PulseView
+        uses: actions/checkout@v3
+        with:
+          # TODO: Clone from sigrok.org
+          repository: knarfS/pulseview
+          path: pulseview
+
+      - name: Build PulseView
+        run: |
+          source sigrok-build/ci/macos/sigrok-macos-init-toolchain.sh
+          mkdir -p pulseview/build
+          cd pulseview/build
+          PKG_CONFIG_PATH=$P cmake \
+            -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_DIR \
+            -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+            -DDISABLE_WERROR=FALSE \
+            -DENABLE_TESTS=FALSE \
+            ..
+          make $PARALLEL $V
+          make install $V
+
+      - name: Build DMG
+        run: |
+          cd sigrok-build/ci/macos
+          source sigrok-macos-init-toolchain.sh
+          ./sigrok-macos-create-dmg.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: sigrok-build/ci/macos/PulseView*.dmg
+
+
   publish:
     name: sigrok artifacts publish
 
@@ -188,6 +256,7 @@ jobs:
     needs:
       - build_pulseview_mxe
       - build_sigrok-cli_mxe
+      - build_pulseview_macos
 
     steps:
       - name: Install dependencies
