@@ -176,7 +176,7 @@ jobs:
           name: artifacts
           path: sigrok-cli/contrib/sigrok-cli*installer.exe
 
-
+ 
   build_pulseview_macos:
     name: PulseView macOS build
 
@@ -245,6 +245,69 @@ jobs:
           path: sigrok-build/ci/macos/PulseView*.dmg
 
 
+  build_sigrok-cli_macos:
+    name: sigrok-cli macOS build
+
+    runs-on: macos-11
+
+    env:
+      TARGET: "x86"
+      # We use Homebrew Qt 5.15.x (current)
+      BREW_QT_VERSION: "qt@5"
+      # We use Homebrew Python 3.x (current)
+      BREW_PYTHON_VERSION: "python@3"
+      # Artifact infos
+      ARTIFACT_TITLE: "sigrok-cli"
+      ARTIFACT_BIN_NAME: "sigrok-cli"
+      ARTIFACT_VERSION: "NIGHTLY"
+
+    steps:
+      - name: Install dependencies
+        run: |
+          brew install autoconf automake autoconf-archive pkg-config sdcc \
+            libtool libzip libusb libftdi hidapi nettle check doxygen swig \
+            glib "$BREW_PYTHON_VERSION" "$BREW_QT_VERSION"
+
+      - name: Checkout sigrok-build
+        uses: actions/checkout@v3
+        with:
+          path: sigrok-build
+
+      - name: Build dependencies
+        run: |
+          cd sigrok-build/ci/macos
+          source sigrok-macos-init-toolchain.sh
+          ./sigrok-macos-build-dependencies.sh
+
+      - name: Checkout sigrok-cli
+        uses: actions/checkout@v3
+        with:
+          # TODO: Clone from sigrok.org
+          repository: sigrokproject/sigrok-cli
+          path: sigrok-cli
+
+      - name: Build sigrok-cli
+        run: |
+          source sigrok-build/ci/macos/sigrok-macos-init-toolchain.sh
+          cd sigrok-cli
+          ./autogen.sh
+          PKG_CONFIG_PATH=$P ./configure $C
+          make $PARALLEL $V
+          make install $V
+
+      - name: Build DMG
+        run: |
+          cd sigrok-build/ci/macos
+          source sigrok-macos-init-toolchain.sh
+          ./sigrok-macos-create-dmg.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: sigrok-build/ci/macos/sigrok-cli*.dmg
+
+
   publish:
     name: sigrok artifacts publish
 
@@ -257,6 +320,7 @@ jobs:
       - build_pulseview_mxe
       - build_sigrok-cli_mxe
       - build_pulseview_macos
+      - build_sigrok-cli_macos
 
     steps:
       - name: Install dependencies
