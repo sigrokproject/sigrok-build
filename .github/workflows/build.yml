@@ -267,6 +267,91 @@ jobs:
           path: sigrok-build/ci/appimage/appimage-build/PulseView-*.AppImage
 
 
+  build_sigrok-cli_appimage:
+    name: sigrok-cli AppImage build (${{ matrix.target.target }})
+
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/knarfs/sigrok-appimage-${{ matrix.target.container }}:latest
+
+    strategy:
+      matrix:
+        target:
+          # - target: "i386"
+          #   container: "x86_64-i386"
+          #   cc: "gcc -m32"
+          #   cxx: "g++ -m32"
+          #   ld: "ld -melf_i386"
+          #   ldflags: "-m32"
+          - target: "x86_64"
+            container: "x86_64"
+            cc: "gcc"
+            cxx: "g++"
+            ld: "ld"
+            ldflags: ""
+
+    env:
+      TARGET: ${{ matrix.target.target }}
+      CC: ${{ matrix.target.cc }}
+      CXX: ${{ matrix.target.cxx }}
+      LD: ${{ matrix.target.ld }}
+      LDFLAGS: ${{ matrix.target.ldflags }}
+      APP_DIR: "${{ github.workspace }}/AppDir"
+      # Artifact infos
+      ARTIFACT_TITLE: "sigrok-cli"
+      ARTIFACT_BIN_NAME: "sigrok-cli"
+      ARTIFACT_VERSION: "NIGHTLY"
+
+    steps:
+      - name: Update dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          # Temp!
+          sudo apt-get install -y libffi-dev
+          # Temp!
+          sudo apt-get install -y python3.6-dev
+
+      - name: Checkout sigrok-build
+        uses: actions/checkout@v3
+        with:
+          path: sigrok-build
+
+      - name: Build dependencies
+        run: |
+          cd sigrok-build/ci/appimage
+          source sigrok-appimage-init-toolchain.sh
+          ./sigrok-appimage-build-dependencies.sh
+
+      - name: Checkout sigrok-cli
+        uses: actions/checkout@v3
+        with:
+          repository: sigrokproject/sigrok-cli
+          path: sigrok-cli
+
+      - name: Build sigrok-cli
+        run: |
+          source sigrok-build/ci/appimage/sigrok-appimage-init-toolchain.sh
+          mkdir -p "$APP_DIR"
+          cd sigrok-cli
+          ./autogen.sh
+          PKG_CONFIG_PATH=$P ./configure --prefix="$APP_DIR"/usr
+          make $PARALLEL $V
+          make install $V
+
+      - name: Build AppImage
+        run: |
+          cd sigrok-build/ci/appimage
+          source sigrok-appimage-init-toolchain.sh
+          ./sigrok-appimage-create-appimage.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: sigrok-build/ci/appimage/appimage-build/sigrok-cli-*.AppImage
+
+
   build_pulseview_macos:
     name: PulseView macOS build
 
@@ -410,6 +495,7 @@ jobs:
       - build_pulseview_mxe
       - build_sigrok-cli_mxe
       - build_pulseview_appimage
+      - build_sigrok-cli_appimage
       - build_pulseview_macos
       - build_sigrok-cli_macos
 
