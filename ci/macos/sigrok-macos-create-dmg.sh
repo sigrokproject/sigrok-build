@@ -106,8 +106,8 @@ cat > $MACOS_DIR/$ARTIFACT_BIN_NAME << EOF
 DIR="\$(dirname "\$0")"
 cd "\$DIR"
 export PYTHONHOME="../Frameworks/Python.framework/Versions/$PYTHON_VERSION"
-export SIGROK_FIRMWARE_DIR="../share/sigrok-firmware"
-export SIGROKDECODE_DIR="../share/libsigrokdecode/decoders"
+export SIGROK_FIRMWARE_PATH="\$SIGROK_FIRMWARE_PATH":../share/sigrok-firmware
+export SIGROKDECODE_PATH="\$SIGROKDECODE_PATH":../share/libsigrokdecode/decoders
 exec ./$ARTIFACT_BIN_NAME.real "\$@"
 EOF
 chmod 755 $MACOS_DIR/$ARTIFACT_BIN_NAME
