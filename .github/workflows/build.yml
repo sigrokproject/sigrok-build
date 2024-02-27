@@ -38,7 +38,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/knarfs/sigrok-mxe:latest
+      image: ghcr.io/abraxa/sigrok-mxe:latest
 
     strategy:
       matrix:
@@ -113,7 +113,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/knarfs/sigrok-mxe:latest
+      image: ghcr.io/abraxa/sigrok-mxe:latest
 
     strategy:
       matrix:
@@ -182,7 +182,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/knarfs/sigrok-appimage-${{ matrix.target.container }}:latest
+      image: ghcr.io/abraxa/sigrok-appimage-${{ matrix.target.container }}:latest
 
     strategy:
       matrix:
@@ -272,7 +272,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/knarfs/sigrok-appimage-${{ matrix.target.container }}:latest
+      image: ghcr.io/abraxa/sigrok-appimage-${{ matrix.target.container }}:latest
 
     strategy:
       matrix:
@@ -390,7 +390,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           # TODO: Clone from sigrok.org
-          repository: knarfS/pulseview
+          repository: abraxa/pulseview
           path: pulseview
 
       - name: Build PulseView
