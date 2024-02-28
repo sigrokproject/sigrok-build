@@ -44,7 +44,8 @@ RUN apt-get update \
 		patch \
 		perl \
 		pkg-config \
-		python \
+		python3 \
+		python-is-python3 \
 		ruby \
 		sed \
 		unzip \
