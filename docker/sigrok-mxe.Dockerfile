@@ -62,26 +62,31 @@ COPY mxe_fixes.patch $BASE_DIR
 RUN git clone https://github.com/mxe/mxe.git $MXE_DIR \
 	&& cd $MXE_DIR \
 	&& git reset --hard b48b3cc7085548e896fe967dc6371ff9951390a4 \
-	&& patch -p1 < $BASE_DIR/mxe_fixes.patch \
-	&& make -j$(nproc) MXE_USE_CCACHE= DONT_CHECK_REQUIREMENTS=1 MXE_TARGETS="$MXE_TARGETS" MXE_PLUGIN_DIRS="$MXE_PLUGIN_DIRS" \
-		gcc \
-		glib \
+	&& patch -p1 < $BASE_DIR/mxe_fixes.patch
+
+make -j$(nproc) MXE_USE_CCACHE= DONT_CHECK_REQUIREMENTS=1 MXE_TARGETS="$MXE_TARGETS" MXE_PLUGIN_DIRS="$MXE_PLUGIN_DIRS" gcc
+make -j$(nproc) MXE_USE_CCACHE= DONT_CHECK_REQUIREMENTS=1 MXE_TARGETS="$MXE_TARGETS" MXE_PLUGIN_DIRS="$MXE_PLUGIN_DIRS" glib
+make -j$(nproc) MXE_USE_CCACHE= DONT_CHECK_REQUIREMENTS=1 MXE_TARGETS="$MXE_TARGETS" MXE_PLUGIN_DIRS="$MXE_PLUGIN_DIRS" \
 		libzip \
 		libusb1 \
 		libftdi1 \
 		hidapi \
+make -j$(nproc) MXE_USE_CCACHE= DONT_CHECK_REQUIREMENTS=1 MXE_TARGETS="$MXE_TARGETS" MXE_PLUGIN_DIRS="$MXE_PLUGIN_DIRS" \
 		glibmm \
 		qtbase \
-		qtimageformats \
+		qtimageformats
+make -j$(nproc) MXE_USE_CCACHE= DONT_CHECK_REQUIREMENTS=1 MXE_TARGETS="$MXE_TARGETS" MXE_PLUGIN_DIRS="$MXE_PLUGIN_DIRS" \
 		qtsvg \
 		qttools \
 		qttranslations \
+make -j$(nproc) MXE_USE_CCACHE= DONT_CHECK_REQUIREMENTS=1 MXE_TARGETS="$MXE_TARGETS" MXE_PLUGIN_DIRS="$MXE_PLUGIN_DIRS" \
 		boost \
+make -j$(nproc) MXE_USE_CCACHE= DONT_CHECK_REQUIREMENTS=1 MXE_TARGETS="$MXE_TARGETS" MXE_PLUGIN_DIRS="$MXE_PLUGIN_DIRS" \
 		check \
 		gendef \
 		libieee1284 \
 		nettle \
 		qwt \
-		qtbase_CONFIGURE_OPTS='-no-sql-mysql' \
-	&& rm -rf $MXE_DIR/.log \
+		qtbase_CONFIGURE_OPTS='-no-sql-mysql'
+rm -rf $MXE_DIR/.log \
 	&& rm -rf $MXE_DIR/mxe/pkg

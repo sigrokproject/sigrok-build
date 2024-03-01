@@ -1,4 +1,4 @@
 #!/bin/sh
 cd docker
-docker build -f sigrok-mxe.Dockerfile .
+docker build --progress=plain -f sigrok-mxe.Dockerfile .
 cd ..
