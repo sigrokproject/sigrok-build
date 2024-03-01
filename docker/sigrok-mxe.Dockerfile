@@ -30,6 +30,7 @@ RUN apt-get update \
 		gettext \
 		git \
 		gperf \
+		gtk-doc-tools \
 		intltool \
 		libc6-dev-i386 \
 		libgdk-pixbuf2.0-dev \
