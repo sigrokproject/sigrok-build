@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: Checkout sigrok-build
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: sigrok-build
 
@@ -65,7 +65,7 @@ jobs:
           ./sigrok-mxe-build-dependencies.sh
 
       - name: Checkout PulseView
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # TODO: Clone from sigrok.org
           repository: sigrokproject/pulseview
@@ -102,7 +102,7 @@ jobs:
           mv pulseview-*installer.exe pulseview-NIGHTLY-${{ matrix.target.target }}-static-$BUILD_TYPE-installer.exe
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifacts
           path: pulseview/build/contrib/pulseview*installer.exe
@@ -129,7 +129,7 @@ jobs:
 
     steps:
       - name: Checkout sigrok-build
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: sigrok-build
 
@@ -140,7 +140,7 @@ jobs:
           ./sigrok-mxe-build-dependencies.sh
 
       - name: Checkout sigrok-cli
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: sigrokproject/sigrok-cli
           path: sigrok-cli
@@ -171,7 +171,7 @@ jobs:
           mv sigrok-cli-*installer.exe sigrok-cli-NIGHTLY-${{ matrix.target.target }}-static-$BUILD_TYPE-installer.exe
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifacts
           path: sigrok-cli/contrib/sigrok-cli*installer.exe
@@ -223,7 +223,7 @@ jobs:
           sudo apt-get install -y libboost-system1.65-dev libboost-filesystem1.65-dev libboost-serialization1.65-dev
 
       - name: Checkout sigrok-build
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: sigrok-build
 
@@ -234,7 +234,7 @@ jobs:
           ./sigrok-appimage-build-dependencies.sh
 
       - name: Checkout PulseView
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: sigrokproject/pulseview
           path: pulseview
@@ -261,7 +261,7 @@ jobs:
           ./sigrok-appimage-create-appimage.sh
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifacts
           path: sigrok-build/ci/appimage/appimage-build/PulseView-*.AppImage
@@ -313,7 +313,7 @@ jobs:
           sudo apt-get install -y python3.6-dev
 
       - name: Checkout sigrok-build
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: sigrok-build
 
@@ -324,7 +324,7 @@ jobs:
           ./sigrok-appimage-build-dependencies.sh
 
       - name: Checkout sigrok-cli
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: sigrokproject/sigrok-cli
           path: sigrok-cli
@@ -346,7 +346,7 @@ jobs:
           ./sigrok-appimage-create-appimage.sh
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifacts
           path: sigrok-build/ci/appimage/appimage-build/sigrok-cli-*.AppImage
@@ -375,8 +375,12 @@ jobs:
             libtool libzip libusb libftdi hidapi nettle check doxygen swig \
             glib glibmm@2.66 cmake boost "$BREW_PYTHON_VERSION" "$BREW_QT_VERSION"
 
+      - name: Abort run as OSX build is cancelled on github currently
+        run: |
+          exit 1
+
       - name: Checkout sigrok-build
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: sigrok-build
 
@@ -387,7 +391,7 @@ jobs:
           ./sigrok-macos-build-dependencies.sh
 
       - name: Checkout PulseView
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # TODO: Clone from sigrok.org
           repository: abraxa/pulseview
@@ -414,7 +418,7 @@ jobs:
           ./sigrok-macos-create-dmg.sh
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifacts
           path: sigrok-build/ci/macos/PulseView*.dmg
@@ -443,8 +447,12 @@ jobs:
             libtool libzip libusb libftdi hidapi nettle check doxygen swig \
             glib "$BREW_PYTHON_VERSION" "$BREW_QT_VERSION"
 
+      - name: Abort run as OSX build is cancelled on github currently
+        run: |
+          exit 1
+
       - name: Checkout sigrok-build
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: sigrok-build
 
@@ -455,7 +463,7 @@ jobs:
           ./sigrok-macos-build-dependencies.sh
 
       - name: Checkout sigrok-cli
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # TODO: Clone from sigrok.org
           repository: sigrokproject/sigrok-cli
@@ -477,7 +485,7 @@ jobs:
           ./sigrok-macos-create-dmg.sh
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifacts
           path: sigrok-build/ci/macos/sigrok-cli*.dmg
@@ -494,10 +502,10 @@ jobs:
     needs:
       - build_pulseview_mxe
       - build_sigrok-cli_mxe
-      - build_pulseview_appimage
-      - build_sigrok-cli_appimage
-      - build_pulseview_macos
-      - build_sigrok-cli_macos
+#      - build_pulseview_appimage
+#      - build_sigrok-cli_appimage
+#      - build_pulseview_macos
+#      - build_sigrok-cli_macos
 
     steps:
       - name: Install dependencies
@@ -506,7 +514,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libfuse2
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
       - name: Inspect directory after downloading artifacts
         run: ls -alFR
       - name: Upload artifacts and create (continuous) release
