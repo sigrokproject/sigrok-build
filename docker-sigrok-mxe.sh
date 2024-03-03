@@ -7,5 +7,6 @@
 cd docker
 docker build --progress=plain -f sigrok-mxe.Dockerfile -t sigrok-mxe . && \
 	echo $CR_PAT | docker login ghcr.io -u $GH_USER --password-stdin && \
+	docker tag sigrok-mxe:latest ghcr.io/$GH_USER/sigrok-mxe:latest && \
 	docker push ghcr.io/$GH_USER/sigrok-mxe:latest
 cd ..
