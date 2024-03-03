@@ -104,7 +104,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts
+          name: artifact-pulseview-mxe
           path: pulseview/build/contrib/pulseview*installer.exe
 
 
@@ -173,7 +173,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts
+          name: artifact-sigrok-cli-mxe
           path: sigrok-cli/contrib/sigrok-cli*installer.exe
 
 
@@ -263,7 +263,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts
+          name: artifact-pulseview-appimage
           path: sigrok-build/ci/appimage/appimage-build/PulseView-*.AppImage
 
 
@@ -348,7 +348,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts
+          name: artifact-sigrok-cli-appimage
           path: sigrok-build/ci/appimage/appimage-build/sigrok-cli-*.AppImage
 
 
@@ -369,15 +369,15 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     steps:
+      - name: Abort run as OSX build is cancelled on github currently
+        run: |
+          exit 1
+
       - name: Install dependencies
         run: |
           brew install autoconf automake autoconf-archive pkg-config sdcc \
             libtool libzip libusb libftdi hidapi nettle check doxygen swig \
             glib glibmm@2.66 cmake boost "$BREW_PYTHON_VERSION" "$BREW_QT_VERSION"
-
-      - name: Abort run as OSX build is cancelled on github currently
-        run: |
-          exit 1
 
       - name: Checkout sigrok-build
         uses: actions/checkout@v4
@@ -420,7 +420,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts
+          name: artifact-pulseview-macos
           path: sigrok-build/ci/macos/PulseView*.dmg
 
 
@@ -441,15 +441,15 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     steps:
+      - name: Abort run as OSX build is cancelled on github currently
+        run: |
+          exit 1
+
       - name: Install dependencies
         run: |
           brew install autoconf automake autoconf-archive pkg-config sdcc \
             libtool libzip libusb libftdi hidapi nettle check doxygen swig \
             glib "$BREW_PYTHON_VERSION" "$BREW_QT_VERSION"
-
-      - name: Abort run as OSX build is cancelled on github currently
-        run: |
-          exit 1
 
       - name: Checkout sigrok-build
         uses: actions/checkout@v4
@@ -487,7 +487,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts
+          name: artifact-sigrok-cli-macos
           path: sigrok-build/ci/macos/sigrok-cli*.dmg
 
 
