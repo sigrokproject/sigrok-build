@@ -513,16 +513,21 @@ jobs:
 #      - build_sigrok-cli_macos
 
     steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+      - name: Inspect directory after downloading artifacts
+        run: ls -alFR
       - name: Create release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            artifact-pulseview-mxe
-            artifact-sigrok-cli-mxe
+            artifact-sigrok-cli-mxe/sigrok-cli-*
+            artifact-pulseview-mxe/pulseview-*
           tag_name: continuous
           generate_release_notes: false
           draft: false
+          fail_on_unmatched_files: true
 
 
   publish:
