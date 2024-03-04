@@ -496,6 +496,34 @@ jobs:
           path: sigrok-build/ci/macos/sigrok-cli*.dmg
           overwrite: true
 
+  release:
+    name: Create release and add artifacts
+
+    runs-on: ubuntu-latest
+
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')
+    needs:
+      - build_pulseview_mxe
+      - build_sigrok-cli_mxe
+#      - build_pulseview_appimage
+#      - build_sigrok-cli_appimage
+#      - build_pulseview_macos
+#      - build_sigrok-cli_macos
+
+    steps:
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifact-pulseview-mxe
+            artifact-sigrok-cli-mxe
+          tag_name: continuous
+          generate_release_notes: false
+          draft: false
+
 
   publish:
     name: sigrok artifacts publish
