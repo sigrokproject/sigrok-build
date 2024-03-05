@@ -517,8 +517,8 @@ jobs:
     needs:
       - build_pulseview_mxe
       - build_sigrok-cli_mxe
-#      - build_pulseview_appimage
-#      - build_sigrok-cli_appimage
+      - build_pulseview_appimage
+      - build_sigrok-cli_appimage
 #      - build_pulseview_macos
 #      - build_sigrok-cli_macos
 
@@ -534,8 +534,10 @@ jobs:
           files: |
             artifact-sigrok-cli-i686-mxe/sigrok-cli-*
             artifact-sigrok-cli-x86_64-mxe/sigrok-cli-*
+            artifact-sigrok-cli-x86_64-appimage/sigrok-cli-*
             artifact-pulseview-i686-mxe/pulseview-*
             artifact-pulseview-x86_64-mxe/pulseview-*
+            artifact-pulseview-x86_64-appimage/pulseview-*
           tag_name: continuous
           generate_release_notes: false
           draft: false
