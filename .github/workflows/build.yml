@@ -533,7 +533,9 @@ jobs:
 #      - build_sigrok-cli_macos
 
     steps:
-      - name: Download artifacts
+      - name: Download AppImage artifacts
+        uses: actions/download-artifact@v3
+      - name: Download all other artifacts
         uses: actions/download-artifact@v4
       - name: Inspect directory after downloading artifacts
         run: ls -alFR
