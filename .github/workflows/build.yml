@@ -266,11 +266,16 @@ jobs:
           source sigrok-appimage-init-toolchain.sh
           ./sigrok-appimage-create-appimage.sh
 
+      - name: Rename artifact
+        run: |
+          cd sigrok-build/ci/appimage/appimage-build
+          mv PulseView-*.AppImage pulseview-NIGHTLY-${{ matrix.target.target }}-${{ matrix.build_type.name }}.appimage
+
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: artifact-pulseview-${{ matrix.target.target }}-appimage
-          path: sigrok-build/ci/appimage/appimage-build/PulseView-*.AppImage
+          path: sigrok-build/ci/appimage/appimage-build/pulseview-*.appimage
 #          overwrite: true
 
 
@@ -352,11 +357,16 @@ jobs:
           source sigrok-appimage-init-toolchain.sh
           ./sigrok-appimage-create-appimage.sh
 
+      - name: Rename artifact
+        run: |
+          cd sigrok-build/ci/appimage/appimage-build
+          mv sigrok-cli-*.AppImage sigrok-cli-NIGHTLY-${{ matrix.target.target }}-debug.appimage
+
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: artifact-sigrok-cli-appimage
-          path: sigrok-build/ci/appimage/appimage-build/sigrok-cli-*.AppImage
+          path: sigrok-build/ci/appimage/appimage-build/sigrok-cli-*.appimage
           overwrite: true
 
 
