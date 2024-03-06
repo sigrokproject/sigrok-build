@@ -1,5 +1,10 @@
 name: sigrok MacOS Docker Build
 
+# This builds the docker image we need to use when building for OSX.
+# As we need an OSX host for running, we do this via github itself.
+# Jobs have a 6-hour execution cap on github and building all the dependencies
+# takes longer than this, so we're breaking the task up into multiple jobs.
+
 on:
   workflow_dispatch:
 
@@ -9,8 +14,51 @@ defaults:
 
 jobs:
 
-  build_docker_macos:
-    name: MacOS docker build
+  build_docker_macos_1:
+    name: MacOS docker build (1)
+
+    runs-on: macos-11
+
+    env:
+      TARGET: "x86"
+      # We use Homebrew Python 3.x (current)
+      BREW_PYTHON_VERSION: "python@3"
+
+    steps:
+#      - name: Install dependencies (1)
+#        run: brew install autoconf automake autoconf-archive pkg-config sdcc
+
+#      - name: Install dependencies (2)
+#        run: brew install libtool libzip libusb libftdi hidapi nettle check doxygen swig
+
+#      - name: Install dependencies (3)
+#        run: brew install glib glibmm@2.66
+
+#      - name: Install dependencies (4)
+#        run: brew install cmake boost
+
+      - name: Install dependencies (5)
+        run: brew install "$BREW_PYTHON_VERSION"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and export
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          tags: sigrok-macos:latest
+          outputs: type=docker,dest=/tmp/sigrok-macos.tar
+
+      - name: Upload docker artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sigrok-macos
+          path: /tmp/sigrok-macos.tar
+
+
+  build_docker_macos_2:
+    name: MacOS docker build (2)
 
     runs-on: macos-11
 
@@ -18,24 +66,20 @@ jobs:
       TARGET: "x86"
       # We use Homebrew Qt 5.15.x (current)
       BREW_QT_VERSION: "qt@5"
-      # We use Homebrew Python 3.x (current)
-      BREW_PYTHON_VERSION: "python@3"
+
+    needs: build_docker_macos_1
 
     steps:
-      - name: Install dependencies (1)
-        run: brew install autoconf automake autoconf-archive pkg-config sdcc
+      - name: Download docker artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: sigrok-macos
+          path: /tmp
 
-      - name: Install dependencies (2)
-        run: brew install libtool libzip libusb libftdi hidapi nettle check doxygen swig
-
-      - name: Install dependencies (3)
-        run: brew install glib glibmm@2.66
-
-      - name: Install dependencies (4)
-        run: brew install cmake boost
-
-      - name: Install dependencies (5)
-        run: brew install "$BREW_PYTHON_VERSION"
+      - name: Load image
+        run: |
+          docker load --input /tmp/sigrok-macos.tar
+          docker image ls -a
 
       - name: Install dependencies (6)
         run: brew install "$BREW_QT_VERSION"
@@ -50,3 +94,16 @@ jobs:
           cd sigrok-build/ci/macos
           source sigrok-macos-init-toolchain.sh
           ./sigrok-macos-build-dependencies.sh
+
+      - name: Build and export
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          tags: sigrok-macos:latest
+          outputs: type=docker,dest=/tmp/sigrok-macos.tar
+
+      - name: Upload docker artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sigrok-macos
+          path: /tmp/sigrok-macos.tar
