@@ -403,7 +403,7 @@ jobs:
 
       - name: Install dependencies (1)
         if: steps.cache-1.outputs.cache-hit != 'true'
-        run: brew install autoconf automake autoconf-archive pkg-config sdcc
+        run: brew install autoconf automake autoconf-archive pkg-config libtool
 
       - name: Cache Homebrew Packages
         if: steps.cache-1.outputs.cache-hit != 'true'
@@ -422,7 +422,7 @@ jobs:
 
       - name: Install dependencies (2)
         if: steps.cache-2.outputs.cache-hit != 'true'
-        run: brew install libtool libzip libusb libftdi hidapi nettle check doxygen swig
+        run: brew install libzip libusb libftdi hidapi nettle check doxygen swig
 
       - name: Cache Homebrew Packages
         if: steps.cache-2.outputs.cache-hit != 'true'
@@ -441,7 +441,7 @@ jobs:
 
       - name: Install dependencies (3)
         if: steps.cache-3.outputs.cache-hit != 'true'
-        run: brew install glib glibmm@2.66 cmake boost $BREW_PYTHON_VERSION
+        run: brew install glib glibmm@2.66 cmake boost sdcc $BREW_PYTHON_VERSION
 
       - name: Cache Homebrew Packages
         if: steps.cache-3.outputs.cache-hit != 'true'
