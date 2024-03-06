@@ -398,7 +398,7 @@ jobs:
         uses: actions/cache/restore@v3
         id: cache-1
         with:
-          path: $(brew --prefix)
+          path: /usr/local/Cellar/
           key: homebrew-packages-1
 
       - name: Install dependencies (1)
@@ -409,7 +409,7 @@ jobs:
         if: steps.cache-1.outputs.cache-hit != 'true'
         uses: actions/cache/save@v3
         with:
-          path: $(brew --prefix)
+          path: /usr/local/Cellar/
           key: homebrew-packages-1
 
       # ------------------------------------------
@@ -417,7 +417,7 @@ jobs:
         uses: actions/cache/restore@v3
         id: cache-2
         with:
-          path: $(brew --prefix)
+          path: /usr/local/Cellar/
           key: homebrew-packages-2
 
       - name: Install dependencies (2)
@@ -428,7 +428,7 @@ jobs:
         if: steps.cache-2.outputs.cache-hit != 'true'
         uses: actions/cache/save@v3
         with:
-          path: $(brew --prefix)
+          path: /usr/local/Cellar/
           key: homebrew-packages-2
 
       # ------------------------------------------
@@ -436,7 +436,7 @@ jobs:
         uses: actions/cache/restore@v3
         id: cache-3
         with:
-          path: $(brew --prefix)
+          path: /usr/local/Cellar/
           key: homebrew-packages-3
 
       - name: Install dependencies (3)
@@ -447,7 +447,7 @@ jobs:
         if: steps.cache-3.outputs.cache-hit != 'true'
         uses: actions/cache/save@v3
         with:
-          path: $(brew --prefix)
+          path: /usr/local/Cellar/
           key: homebrew-packages-3
 
 
