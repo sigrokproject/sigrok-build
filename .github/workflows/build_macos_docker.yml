@@ -1,0 +1,52 @@
+name: sigrok MacOS Docker Build
+
+on:
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  build_docker_macos:
+    name: MacOS docker build
+
+    runs-on: macos-11
+
+    env:
+      TARGET: "x86"
+      # We use Homebrew Qt 5.15.x (current)
+      BREW_QT_VERSION: "qt@5"
+      # We use Homebrew Python 3.x (current)
+      BREW_PYTHON_VERSION: "python@3"
+
+    steps:
+      - name: Install dependencies (1)
+        run: brew install autoconf automake autoconf-archive pkg-config sdcc
+
+      - name: Install dependencies (2)
+        run: brew install libtool libzip libusb libftdi hidapi nettle check doxygen swig
+
+      - name: Install dependencies (3)
+        run: brew install glib glibmm@2.66
+
+      - name: Install dependencies (4)
+        run: brew install cmake boost
+
+      - name: Install dependencies (5)
+        run: brew install "$BREW_PYTHON_VERSION"
+
+      - name: Install dependencies (6)
+        run: brew install "$BREW_QT_VERSION"
+
+      - name: Checkout sigrok-build
+        uses: actions/checkout@v4
+        with:
+          path: sigrok-build
+
+      - name: Build dependencies
+        run: |
+          cd sigrok-build/ci/macos
+          source sigrok-macos-init-toolchain.sh
+          ./sigrok-macos-build-dependencies.sh
