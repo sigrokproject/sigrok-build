@@ -40,13 +40,17 @@ jobs:
       - name: Install dependencies (5)
         run: brew install "$BREW_PYTHON_VERSION"
 
+      - name: Setup Docker
+        uses: docker-practice/actions-setup-docker@master
+
+      - run: set -x
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build and export
         uses: docker/build-push-action@v5
         with:
-          context: .
           tags: sigrok-macos:latest
           outputs: type=docker,dest=/tmp/sigrok-macos.tar
 
@@ -95,10 +99,17 @@ jobs:
           source sigrok-macos-init-toolchain.sh
           ./sigrok-macos-build-dependencies.sh
 
+      - name: Setup Docker
+        uses: docker-practice/actions-setup-docker@master
+
+      - run: set -x
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build and export
         uses: docker/build-push-action@v5
         with:
-          context: .
           tags: sigrok-macos:latest
           outputs: type=docker,dest=/tmp/sigrok-macos.tar
 
