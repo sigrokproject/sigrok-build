@@ -403,9 +403,14 @@ jobs:
 
       - name: Install dependencies (1)
         if: steps.cache-1.outputs.cache-hit != 'true'
-        run: brew install autoconf automake autoconf-archive pkg-config libtool
+        run: |
+          brew install autoconf automake autoconf-archive pkg-config libtool \
+          libzip libusb libftdi hidapi nettle check doxygen swig \
+          glib glibmm@2.66 cmake boost sdcc $BREW_PYTHON_VERSION \
+          bison flex krb5 libxslt sqlite freetype jpeg-turbo libpng pcre2 webp
+          # Last line are qt5 dependencies, taken from https://github.com/Homebrew/homebrew-core/blob/5aaa8a4d48eb29ebadf716834355312f41154162/Formula/q/qt@5.rb
 
-      - name: Cache Homebrew Packages
+      - name: Cache Homebrew Packages (1)
         if: steps.cache-1.outputs.cache-hit != 'true'
         uses: actions/cache/save@v3
         with:
@@ -422,9 +427,9 @@ jobs:
 
       - name: Install dependencies (2)
         if: steps.cache-2.outputs.cache-hit != 'true'
-        run: brew install libzip libusb libftdi hidapi nettle check doxygen swig
+        run: brew install "$BREW_QT_VERSION"
 
-      - name: Cache Homebrew Packages
+      - name: Cache Homebrew Packages (2)
         if: steps.cache-2.outputs.cache-hit != 'true'
         uses: actions/cache/save@v3
         with:
@@ -432,32 +437,6 @@ jobs:
           key: homebrew-packages-2
 
       # ------------------------------------------
-      - name: Check for dependency cache (3)
-        uses: actions/cache/restore@v3
-        id: cache-3
-        with:
-          path: /usr/local/Cellar/
-          key: homebrew-packages-3
-
-      - name: Install dependencies (3)
-        if: steps.cache-3.outputs.cache-hit != 'true'
-        run: brew install glib glibmm@2.66 cmake boost sdcc $BREW_PYTHON_VERSION
-
-      - name: Cache Homebrew Packages
-        if: steps.cache-3.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v3
-        with:
-          path: /usr/local/Cellar/
-          key: homebrew-packages-3
-
-
-      # qt5 dependencies, taken from https://github.com/Homebrew/homebrew-core/blob/5aaa8a4d48eb29ebadf716834355312f41154162/Formula/q/qt@5.rb
-      - name: Install dependencies (4)
-        run: brew bison flex krb5 libxslt sqlite freetype jpeg-turbo libpng pcre2 webp
-
-      - name: Install dependencies (5)
-        run: brew install  "$BREW_QT_VERSION"
-
       - name: Checkout sigrok-build
         uses: actions/checkout@v4
         with:
