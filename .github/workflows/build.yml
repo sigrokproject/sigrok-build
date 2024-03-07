@@ -397,6 +397,10 @@ jobs:
           libzip libusb libftdi hidapi nettle check doxygen swig \
           glib glibmm@2.66 cmake boost sdcc $BREW_PYTHON_VERSION $BREW_QT_VERSION
 
+      - name: Provide qt also in prefix directory as qt is using a keg
+        run: |
+          brew link -f $BREW_QT_VERSION
+
       - name: Checkout sigrok-build
         uses: actions/checkout@v4
         with:
