@@ -383,8 +383,6 @@ jobs:
 
     env:
       TARGET: "x86"
-      # We use Homebrew Qt 5.15.x (current)
-      BREW_QT_VERSION: "qt@5"
       # We use Homebrew Python 3.x (current)
       BREW_PYTHON_VERSION: "python@3"
       # Artifact infos
@@ -427,7 +425,11 @@ jobs:
 
       - name: Install dependencies (2)
         if: steps.cache-2.outputs.cache-hit != 'true'
-        run: brew install "$BREW_QT_VERSION"
+        run: |
+          wget -O "/tmp/qtAT5.rb" "https://raw.githubusercontent.com/Homebrew/homebrew-core/master/Formula/q/qt%405.rb"
+          sed -i '' 's/"make"/"make -j 8"/' "/tmp/qtAT5.rb"
+          sed -i '' 's/qtAT5/qtat5/' /tmp/qtAT5.rb
+          brew install --build-from-source "/tmp/qtAT5.rb"
 
       - name: Cache Homebrew Packages (2)
         if: steps.cache-2.outputs.cache-hit != 'true'
