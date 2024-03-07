@@ -26,23 +26,14 @@ set -e
 set -x
 
 
-echo "------------------------------------------"
-echo $(brew --prefix "$BREW_QT_VERSION")
-find /usr/local/opt/qt
-echo "------------------------------------------"
-echo $(brew --cellar "$BREW_QT_VERSION")
-echo "------------------------------------------"
 # Note: Turn "qt 6.6.1" into "qt/6.6.1"
 QT_VER=$(brew list --versions qt)
 QT_VER_PATH=$(echo $QT_VER | sed 's# #/#')
-p=$(brew --cellar)/$QT_VER_PATH/share/qt/translations
-find $p -iname "qt*.qm"
-echo "------------------------------------------"
-echo "------------------------------------------"
 
 # Path to Qt5 binaries
 QT_BIN_DIR=$(brew list "$BREW_QT_VERSION" | grep bin | head -n 1 | xargs dirname)
-QT_TRANSLATIONS_DIR=$p
+QT_TRANSLATIONS_DIR=$(brew --cellar)/$QT_VER_PATH/share/qt/translations
+
 
 # Path to Python 3 framework
 PYTHON_FRAMEWORK_DIR=$(brew list "$BREW_PYTHON_VERSION" | grep Python.framework/Python | head -n 1 | xargs dirname)

@@ -107,7 +107,6 @@ jobs:
         with:
           name: artifact-pulseview-${{ matrix.target.target }}-mxe
           path: pulseview/build/contrib/pulseview*installer.exe
-          overwrite: true
 
 
   build_sigrok-cli_mxe:
@@ -177,7 +176,6 @@ jobs:
         with:
           name: artifact-sigrok-cli-${{ matrix.target.target }}-mxe
           path: sigrok-cli/contrib/sigrok-cli*installer.exe
-          overwrite: true
 
 
   build_pulseview_appimage:
@@ -276,7 +274,6 @@ jobs:
         with:
           name: artifact-pulseview-${{ matrix.target.target }}-appimage
           path: sigrok-build/ci/appimage/appimage-build/pulseview-*.appimage
-#          overwrite: true
 
 
   build_sigrok-cli_appimage:
@@ -367,26 +364,26 @@ jobs:
         with:
           name: artifact-sigrok-cli-x86_64-appimage
           path: sigrok-build/ci/appimage/appimage-build/sigrok-cli-*.appimage
-          overwrite: true
 
 
   build_pulseview_macos:
-    name: PulseView macOS build (${{ matrix.build_type.type }}) ${{ matrix.build_type.type }}
+    name: PulseView macOS build
 
     runs-on: macos-12
 
-    strategy:
-      matrix:
-        build_type:
-          - { type: "Release", name: "release" }
-          - { type: "Debug", name: "debug" }
+# Note: For now, we only supply debug builds
+#    strategy:
+#      matrix:
+#        build_type:
+#          - { type: "Release", name: "release" }
+#          - { type: "Debug", name: "debug" }
 
     env:
       TARGET: "x86"
       BREW_PYTHON_VERSION: "python@3"
       BREW_QT_VERSION: "qt"
       # Artifact infos
-      ARTIFACT_TITLE: "PulseView"
+      ARTIFACT_TITLE: "pulseview"
       ARTIFACT_BIN_NAME: "pulseview"
       ARTIFACT_VERSION: "NIGHTLY"
 
@@ -397,9 +394,9 @@ jobs:
           libzip libusb libftdi hidapi nettle check doxygen swig \
           glib glibmm@2.66 cmake boost sdcc $BREW_PYTHON_VERSION $BREW_QT_VERSION
 
-      - name: Provide qt also in prefix directory as qt is using a keg
-        run: |
-          brew link -f $BREW_QT_VERSION
+#      - name: Provide qt also in prefix directory as qt is using a keg
+#        run: |
+#          brew link -f $BREW_QT_VERSION
 
       - name: Checkout sigrok-build
         uses: actions/checkout@v4
@@ -426,7 +423,7 @@ jobs:
           cd pulseview/build
           PKG_CONFIG_PATH=$P cmake \
             -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_DIR \
-            -DCMAKE_BUILD_TYPE=${{ matrix.build_type.type }} \
+            -DCMAKE_BUILD_TYPE=Debug \
             -DDISABLE_WERROR=FALSE \
             -DENABLE_TESTS=FALSE \
             ..
@@ -442,21 +439,18 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: artifact-pulseview-${{ matrix.build_type.name }}-macos
+          name: artifact-pulseview-macos
           path: sigrok-build/ci/macos/PulseView*.dmg
-#          overwrite: true
 
 
   build_sigrok-cli_macos:
     name: sigrok-cli macOS build
 
-    runs-on: macos-11
+    runs-on: macos-12
 
     env:
       TARGET: "x86"
-      # We use Homebrew Qt 5.15.x (current)
-      BREW_QT_VERSION: "qt@5"
-      # We use Homebrew Python 3.x (current)
+      BREW_QT_VERSION: "qt"
       BREW_PYTHON_VERSION: "python@3"
       # Artifact infos
       ARTIFACT_TITLE: "sigrok-cli"
@@ -464,10 +458,6 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     steps:
-      - name: Abort run as OSX build is cancelled on github currently
-        run: |
-          exit 1
-
       - name: Install dependencies
         run: |
           brew install autoconf automake autoconf-archive pkg-config sdcc \
@@ -512,7 +502,6 @@ jobs:
         with:
           name: artifact-sigrok-cli-macos
           path: sigrok-build/ci/macos/sigrok-cli*.dmg
-          overwrite: true
 
   release:
     name: Create release and add artifacts
@@ -527,8 +516,8 @@ jobs:
       - build_sigrok-cli_mxe
       - build_pulseview_appimage
       - build_sigrok-cli_appimage
-#      - build_pulseview_macos
-#      - build_sigrok-cli_macos
+      - build_pulseview_macos
+      - build_sigrok-cli_macos
 
     steps:
       - name: Download AppImage artifacts
@@ -545,9 +534,11 @@ jobs:
             artifact-sigrok-cli-i686-mxe/sigrok-cli-*
             artifact-sigrok-cli-x86_64-mxe/sigrok-cli-*
             artifact-sigrok-cli-x86_64-appimage/sigrok-cli-*
+            artifact-sigrok-cli-macos/sigrok-cli-*
             artifact-pulseview-i686-mxe/pulseview-*
             artifact-pulseview-x86_64-mxe/pulseview-*
             artifact-pulseview-x86_64-appimage/pulseview-*
+            artifact-pulseview-macos/pulseview-*
           tag_name: continuous
           generate_release_notes: false
           draft: false
