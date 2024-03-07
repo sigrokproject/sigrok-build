@@ -391,6 +391,10 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     steps:
+      - name: test
+        run: |
+          find / -iname "qt*.rb"
+
       # ------------------------------------------
       - name: Check for dependency cache (1)
         uses: actions/cache/restore@v3
@@ -429,6 +433,7 @@ jobs:
           wget -O "/tmp/qtAT5.rb" "https://raw.githubusercontent.com/Homebrew/homebrew-core/master/Formula/q/qt%405.rb"
           sed -i '' 's/"make"/"make -j 8"/' "/tmp/qtAT5.rb"
           sed -i '' 's/qtAT5/qtat5/' /tmp/qtAT5.rb
+          cat /tmp/qtAT5.rb
           brew install --build-from-source "/tmp/qtAT5.rb"
 
       - name: Cache Homebrew Packages (2)
