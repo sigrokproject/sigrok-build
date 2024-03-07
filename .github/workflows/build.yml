@@ -392,8 +392,10 @@ jobs:
 
     steps:
       - name: test
+#          find / -iname "qt*.rb"
         run: |
-          find / -iname "qt*.rb"
+          ls -al /System/Volumes/Data/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/q/qt@5.rb
+          sed -i '' 's/"make"/"make -j 8"/' /System/Volumes/Data/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/q/qt@5.rb
 
       # ------------------------------------------
       - name: Check for dependency cache (1)
@@ -434,7 +436,8 @@ jobs:
           sed -i '' 's/"make"/"make -j 8"/' "/tmp/qtAT5.rb"
           sed -i '' 's/qtAT5/qtat5/' /tmp/qtAT5.rb
           cat /tmp/qtAT5.rb
-          brew install --build-from-source "/tmp/qtAT5.rb"
+          brew reinstall webp
+          brew install qt@5
 
       - name: Cache Homebrew Packages (2)
         if: steps.cache-2.outputs.cache-hit != 'true'
