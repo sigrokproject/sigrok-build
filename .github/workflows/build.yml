@@ -105,7 +105,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: artifact-pulseview-${{ matrix.target.target }}-mxe
+          name: artifact-pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-mxe
           path: pulseview/build/contrib/pulseview*installer.exe
 
 
@@ -440,7 +440,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifact-pulseview-macos
-          path: sigrok-build/ci/macos/PulseView*.dmg
+          path: sigrok-build/ci/macos/pulseview*.dmg
 
 
   build_sigrok-cli_macos:
@@ -535,8 +535,10 @@ jobs:
             artifact-sigrok-cli-x86_64-mxe/sigrok-cli-*
             artifact-sigrok-cli-x86_64-appimage/sigrok-cli-*
             artifact-sigrok-cli-macos/sigrok-cli-*
-            artifact-pulseview-i686-mxe/pulseview-*
-            artifact-pulseview-x86_64-mxe/pulseview-*
+            artifact-pulseview-i686-debug-mxe/pulseview-*
+            artifact-pulseview-i686-release-mxe/pulseview-*
+            artifact-pulseview-x86_64-debug-mxe/pulseview-*
+            artifact-pulseview-x86_64-release-mxe/pulseview-*
             artifact-pulseview-x86_64-appimage/pulseview-*
             artifact-pulseview-macos/pulseview-*
           tag_name: continuous
