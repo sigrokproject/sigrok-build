@@ -432,7 +432,7 @@ jobs:
       - name: Install dependencies (2)
         if: steps.cache-2.outputs.cache-hit != 'true'
         run: |
-          brew install qt@5
+          brew install qt
 #          wget -O "/tmp/qtAT5.rb" "https://raw.githubusercontent.com/Homebrew/homebrew-core/master/Formula/q/qt%405.rb"
 #          sed -i '' 's/"make"/"make -j 8"/' "/tmp/qtAT5.rb"
 #          sed -i '' 's/qtAT5/qtat5/' /tmp/qtAT5.rb
