@@ -373,7 +373,7 @@ jobs:
   build_pulseview_macos:
     name: PulseView macOS build (${{ matrix.build_type.type }}) ${{ matrix.build_type.type }}
 
-    runs-on: macos-11
+    runs-on: macos-12
 
     strategy:
       matrix:
@@ -391,60 +391,60 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     steps:
-      - name: test
+#      - name: test
 #          find / -iname "qt*.rb"
-        run: |
-          ls -al /System/Volumes/Data/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/q/qt@5.rb
-          sed -i '' 's/"make"/"make -j 8"/' /System/Volumes/Data/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/q/qt@5.rb
+#        run: |
+#          ls -al /System/Volumes/Data/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/q/qt@5.rb
+#          sed -i '' 's/"make"/"make -j 8"/' /System/Volumes/Data/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/q/qt@5.rb
 
       # ------------------------------------------
-      - name: Check for dependency cache (1)
-        uses: actions/cache/restore@v3
-        id: cache-1
-        with:
-          path: /usr/local/Cellar/
-          key: homebrew-packages-1
+#      - name: Check for dependency cache (1)
+#        uses: actions/cache/restore@v3
+#        id: cache-1
+#        with:
+#          path: /usr/local/Cellar/
+#          key: homebrew-packages-1
 
       - name: Install dependencies (1)
-        if: steps.cache-1.outputs.cache-hit != 'true'
+#        if: steps.cache-1.outputs.cache-hit != 'true'
         run: |
           brew install autoconf automake autoconf-archive pkg-config libtool \
           libzip libusb libftdi hidapi nettle check doxygen swig \
-          glib glibmm@2.66 cmake boost sdcc $BREW_PYTHON_VERSION \
-          bison flex krb5 libxslt sqlite freetype jpeg-turbo libpng pcre2 webp
+          glib glibmm@2.66 cmake boost sdcc $BREW_PYTHON_VERSION
+ #         bison flex krb5 libxslt sqlite freetype jpeg-turbo libpng pcre2 webp
           # Last line are qt5 dependencies, taken from https://github.com/Homebrew/homebrew-core/blob/5aaa8a4d48eb29ebadf716834355312f41154162/Formula/q/qt@5.rb
 
-      - name: Cache Homebrew Packages (1)
-        if: steps.cache-1.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v3
-        with:
-          path: /usr/local/Cellar/
-          key: homebrew-packages-1
+#      - name: Cache Homebrew Packages (1)
+#        if: steps.cache-1.outputs.cache-hit != 'true'
+#        uses: actions/cache/save@v3
+#        with:
+#          path: /usr/local/Cellar/
+#          key: homebrew-packages-1
 
       # ------------------------------------------
-      - name: Check for dependency cache (2)
-        uses: actions/cache/restore@v3
-        id: cache-2
-        with:
-          path: /usr/local/Cellar/
-          key: homebrew-packages-2
+#      - name: Check for dependency cache (2)
+#        uses: actions/cache/restore@v3
+#        id: cache-2
+#        with:
+#          path: /usr/local/Cellar/
+#          key: homebrew-packages-2
 
       - name: Install dependencies (2)
         if: steps.cache-2.outputs.cache-hit != 'true'
         run: |
-          wget -O "/tmp/qtAT5.rb" "https://raw.githubusercontent.com/Homebrew/homebrew-core/master/Formula/q/qt%405.rb"
-          sed -i '' 's/"make"/"make -j 8"/' "/tmp/qtAT5.rb"
-          sed -i '' 's/qtAT5/qtat5/' /tmp/qtAT5.rb
-          cat /tmp/qtAT5.rb
-          brew reinstall webp
           brew install qt@5
+#          wget -O "/tmp/qtAT5.rb" "https://raw.githubusercontent.com/Homebrew/homebrew-core/master/Formula/q/qt%405.rb"
+#          sed -i '' 's/"make"/"make -j 8"/' "/tmp/qtAT5.rb"
+#          sed -i '' 's/qtAT5/qtat5/' /tmp/qtAT5.rb
+#          cat /tmp/qtAT5.rb
+#          brew reinstall webp
 
-      - name: Cache Homebrew Packages (2)
-        if: steps.cache-2.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v3
-        with:
-          path: /usr/local/Cellar/
-          key: homebrew-packages-2
+#      - name: Cache Homebrew Packages (2)
+#        if: steps.cache-2.outputs.cache-hit != 'true'
+#        uses: actions/cache/save@v3
+#        with:
+#          path: /usr/local/Cellar/
+#          key: homebrew-packages-2
 
       # ------------------------------------------
       - name: Checkout sigrok-build
