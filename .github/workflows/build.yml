@@ -100,7 +100,7 @@ jobs:
       - name: Rename artifact
         run: |
           cd pulseview/build/contrib
-          mv pulseview-*installer.exe pulseview-NIGHTLY-${{ matrix.target.target }}-static-${{ matrix.build_type.name }}-installer.exe
+          mv pulseview-*installer.exe pulseview-NIGHTLY-${{ matrix.target.target }}-${{ matrix.build_type.name }}-installer.exe
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -169,7 +169,7 @@ jobs:
       - name: Rename artifact
         run: |
           cd sigrok-cli/contrib
-          mv sigrok-cli-*installer.exe sigrok-cli-NIGHTLY-${{ matrix.target.target }}-static-debug-installer.exe
+          mv sigrok-cli-*installer.exe sigrok-cli-NIGHTLY-${{ matrix.target.target }}-debug-installer.exe
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
