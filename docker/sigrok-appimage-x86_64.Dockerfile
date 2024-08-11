@@ -3,10 +3,10 @@ LABEL \
 	org.opencontainers.image.title="sigrok AppImage x86_64 Build Image" \
 	org.opencontainers.image.description="This image is used to build the sigrok x86_64 AppImage artefacts" \
 	org.opencontainers.image.url="https://sigrok.org" \
-	org.opencontainers.image.source="https://github.com/abraxa/sigrok-build" \
+	org.opencontainers.image.source="https://github.com/sigrokproject/sigrok-build" \
 	org.opencontainers.image.licenses="GPL-3.0-or-later" \
-	org.opencontainers.image.authors="Frank Stettner <frank-stettner@gmx.net>" \
-	maintainer="Frank Stettner <frank-stettner@gmx.net>"
+	org.opencontainers.image.authors="Soeren Apel <sigrok@apelpie.net>, Frank Stettner <frank-stettner@gmx.net>" \
+	maintainer="Soeren Apel <sigrok@apelpie.net>"
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV BASE_DIR /opt
