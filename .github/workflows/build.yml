@@ -36,7 +36,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/abraxa/sigrok-mxe:latest
+      image: ghcr.io/sigrokproject/sigrok-mxe:latest
 
     strategy:
       matrix:
@@ -114,7 +114,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/abraxa/sigrok-mxe:latest
+      image: ghcr.io/sigrokproject/sigrok-mxe:latest
 
     strategy:
       matrix:
@@ -183,7 +183,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/abraxa/sigrok-appimage-${{ matrix.target.container }}:latest
+      image: ghcr.io/sigrokproject/sigrok-appimage-${{ matrix.target.container }}:latest
 
     strategy:
       matrix:
@@ -283,7 +283,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/abraxa/sigrok-appimage-${{ matrix.target.container }}:latest
+      image: ghcr.io/sigrokproject/sigrok-appimage-${{ matrix.target.container }}:latest
 
     strategy:
       matrix:
