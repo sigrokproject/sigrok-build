@@ -17,7 +17,7 @@ jobs:
   build_docker_macos_1:
     name: MacOS docker build (1)
 
-    runs-on: macos-11
+    runs-on: macos-12
 
     env:
       TARGET: "x86"
@@ -64,7 +64,7 @@ jobs:
   build_docker_macos_2:
     name: MacOS docker build (2)
 
-    runs-on: macos-11
+    runs-on: macos-12
 
     env:
       TARGET: "x86"
