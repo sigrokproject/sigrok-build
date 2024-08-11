@@ -215,6 +215,8 @@ jobs:
       ARTIFACT_TITLE: "PulseView"
       ARTIFACT_BIN_NAME: "pulseview"
       ARTIFACT_VERSION: "NIGHTLY"
+      # See https://github.com/actions/checkout/issues/1590#issuecomment-2219382750
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
     steps:
       - name: Update dependencies
@@ -310,6 +312,8 @@ jobs:
       ARTIFACT_TITLE: "sigrok-cli"
       ARTIFACT_BIN_NAME: "sigrok-cli"
       ARTIFACT_VERSION: "NIGHTLY"
+      # See https://github.com/actions/checkout/issues/1590#issuecomment-2219382750
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
     steps:
       - name: Update dependencies
