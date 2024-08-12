@@ -1,8 +1,9 @@
-name: sigrok Artifacts Build
+name: Reusable sigrok Artifacts Builder Workflows
 
 on:
   push:
   workflow_dispatch:
+  workflow_call:
 
 defaults:
   run:
@@ -507,8 +508,8 @@ jobs:
           name: artifact-sigrok-cli-macos
           path: sigrok-build/ci/macos/sigrok-cli*.dmg
 
-  release:
-    name: Create release and add artifacts
+  continuous_release:
+    name: Create continuous release and add artifacts to it
 
     runs-on: ubuntu-latest
 
