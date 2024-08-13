@@ -508,7 +508,7 @@ jobs:
           name: artifact-sigrok-cli-macos
           path: sigrok-build/ci/macos/sigrok-cli*.dmg
 
-  continous_release_pulseview:
+  continuous_release_pulseview:
     name: Create continuous PulseView release and add artifacts to it
     runs-on: ubuntu-latest
 
