@@ -643,5 +643,5 @@ jobs:
           GH_REPO: ${{ github.repository }}
           GH_EVENT_NAME: ${{ github.event_name }}
           GH_REF: ${{ github.ref }}
-        run: echo "Repo: $GH_REPO / Event: $GH_EVENT_NAME / Ref: $GH_REF"
+        run: echo "Repo $GH_REPO, Event $GH_EVENT_NAME, Ref $GH_REF"
 
