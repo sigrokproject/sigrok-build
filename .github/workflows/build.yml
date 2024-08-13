@@ -591,3 +591,7 @@ jobs:
     needs:
       - continuous_release_pulseview
       - continuous_release_sigrok-cli
+
+    steps:
+      - name: Dummy
+        run: echo
