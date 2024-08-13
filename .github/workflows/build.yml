@@ -58,6 +58,7 @@ jobs:
       - name: Checkout sigrok-build
         uses: actions/checkout@v4
         with:
+          repository: sigrokproject/sigrok-build
           path: sigrok-build
 
       - name: Build dependencies
@@ -133,6 +134,7 @@ jobs:
       - name: Checkout sigrok-build
         uses: actions/checkout@v4
         with:
+          repository: sigrokproject/sigrok-build
           path: sigrok-build
 
       - name: Build dependencies
@@ -232,6 +234,7 @@ jobs:
       - name: Checkout sigrok-build
         uses: actions/checkout@v3
         with:
+          repository: sigrokproject/sigrok-build
           path: sigrok-build
 
       - name: Build dependencies
@@ -329,6 +332,7 @@ jobs:
       - name: Checkout sigrok-build
         uses: actions/checkout@v3
         with:
+          repository: sigrokproject/sigrok-build
           path: sigrok-build
 
       - name: Build dependencies
@@ -406,6 +410,7 @@ jobs:
       - name: Checkout sigrok-build
         uses: actions/checkout@v4
         with:
+          repository: sigrokproject/sigrok-build
           path: sigrok-build
 
       - name: Build dependencies
@@ -472,6 +477,7 @@ jobs:
       - name: Checkout sigrok-build
         uses: actions/checkout@v4
         with:
+          repository: sigrokproject/sigrok-build
           path: sigrok-build
 
       - name: Build dependencies
