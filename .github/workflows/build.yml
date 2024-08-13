@@ -1,4 +1,4 @@
-name: Reusable sigrok Artifacts Builder Workflows
+name: Reusable sigrok Artifact Builder Workflows
 
 on:
   push:

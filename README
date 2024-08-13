@@ -1,2 +1,3 @@
 Build pipeline for sigrok artifacts
 
+[![sigrok Artifact Builder Workflows](https://github.com/sigrokproject/sigrok-build/actions/workflows/build.yml/badge.svg)](https://github.com/sigrokproject/sigrok-build/actions/workflows/build.yml)
