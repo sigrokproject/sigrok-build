@@ -56,10 +56,9 @@ jobs:
 
     steps:
       - name: Checkout sigrok-build
-        uses: actions/checkout@v4
-        with:
-          repository: sigrokproject/sigrok-build
-          path: sigrok-build
+        # Cannot use actions/checkout because it always checks out the calling actions' repo, not the one specified
+        run: |
+          git clone https://github.com/sigrokproject/sigrok-build.git
 
       - name: Build dependencies
         run: |
@@ -132,10 +131,9 @@ jobs:
 
     steps:
       - name: Checkout sigrok-build
-        uses: actions/checkout@v4
-        with:
-          repository: sigrokproject/sigrok-build
-          path: sigrok-build
+        # Cannot use actions/checkout because it always checks out the calling actions' repo, not the one specified
+        run: |
+          git clone https://github.com/sigrokproject/sigrok-build.git
 
       - name: Build dependencies
         run: |
@@ -232,10 +230,9 @@ jobs:
           sudo apt-get install -y libboost-system1.65-dev libboost-filesystem1.65-dev libboost-serialization1.65-dev
 
       - name: Checkout sigrok-build
-        uses: actions/checkout@v3
-        with:
-          repository: sigrokproject/sigrok-build
-          path: sigrok-build
+        # Cannot use actions/checkout because it always checks out the calling actions' repo, not the one specified
+        run: |
+          git clone https://github.com/sigrokproject/sigrok-build.git
 
       - name: Build dependencies
         run: |
@@ -330,10 +327,9 @@ jobs:
           sudo apt-get install -y python3.6-dev
 
       - name: Checkout sigrok-build
-        uses: actions/checkout@v3
-        with:
-          repository: sigrokproject/sigrok-build
-          path: sigrok-build
+        # Cannot use actions/checkout because it always checks out the calling actions' repo, not the one specified
+        run: |
+          git clone https://github.com/sigrokproject/sigrok-build.git
 
       - name: Build dependencies
         run: |
@@ -408,10 +404,9 @@ jobs:
 #          brew link -f $BREW_QT_VERSION
 
       - name: Checkout sigrok-build
-        uses: actions/checkout@v4
-        with:
-          repository: sigrokproject/sigrok-build
-          path: sigrok-build
+        # Cannot use actions/checkout because it always checks out the calling actions' repo, not the one specified
+        run: |
+          git clone https://github.com/sigrokproject/sigrok-build.git
 
       - name: Build dependencies
         run: |
@@ -475,10 +470,9 @@ jobs:
             glib "$BREW_PYTHON_VERSION" "$BREW_QT_VERSION"
 
       - name: Checkout sigrok-build
-        uses: actions/checkout@v4
-        with:
-          repository: sigrokproject/sigrok-build
-          path: sigrok-build
+        # Cannot use actions/checkout because it always checks out the calling actions' repo, not the one specified
+        run: |
+          git clone https://github.com/sigrokproject/sigrok-build.git
 
       - name: Build dependencies
         run: |
