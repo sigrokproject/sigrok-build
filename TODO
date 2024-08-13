@@ -5,15 +5,13 @@
 - On push to master, update continuous builds
 	Ignore paths, see https://github.com/knarfS/smuview/blob/master/.github/workflows/build.yml
 
-- Figure out how to upload the artifacts to the individual repos
+- Figure out how to trigger on a new tag creation while setting proper make flags and naming the release with the tag
 
 - Figure out how to trigger on PR creation and upload artifacts to PRs
 
 - Do the macOS builds need debug/release versions or is only one needed?
 
 - Add i386 builds
-
-- Figure out how to do actual release builds
 
 - Build API references that can be mirrored and hosted by sigrok.org
 
