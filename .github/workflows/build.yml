@@ -541,7 +541,7 @@ jobs:
     name: Create continuous PulseView release and add artifacts to it
 
     if: |
-      (endsWith(github.repository, 'pulseview')) &&
+      (endsWith(github.repository, 'pulseview') || (endsWith(github.repository, 'sigrok-build')) &&
       ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'))
 
@@ -580,7 +580,7 @@ jobs:
     name: Create continuous sigrok-cli release and add artifacts to it
 
     if: |
-      (endsWith(github.repository, 'sigrok-cli')) &&
+      (endsWith(github.repository, 'sigrok-cli') || (endsWith(github.repository, 'sigrok-build')) &&
       ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'))
 
