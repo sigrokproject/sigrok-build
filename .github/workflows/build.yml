@@ -513,7 +513,7 @@ jobs:
     runs-on: ubuntu-latest
 
     if: |
-      (endsWith(${{ github.repository }}, 'pulseview') &&
+      (endsWith(github.repository, 'pulseview') &&
       ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'))
     needs:
@@ -522,6 +522,12 @@ jobs:
       - build_pulseview_macos
 
     steps:
+      - name: Debug output
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_EVENT_NAME: ${{ github.event_name }}
+          GH_REF: ${{ github.ref }}
+        run: echo "$GH_REPO / $GH_EVENT_NAME / $GH_REF"
       - name: Download AppImage artifacts
         uses: actions/download-artifact@v3
       - name: Download all other artifacts
@@ -550,7 +556,7 @@ jobs:
     runs-on: ubuntu-latest
 
     if: |
-      (endsWith(${{ github.repository }}, 'sigrok-cli') &&
+      (endsWith(github.repository, 'sigrok-cli') &&
       ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'))
     needs:
@@ -559,6 +565,12 @@ jobs:
       - build_sigrok-cli_macos
 
     steps:
+      - name: Debug output
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_EVENT_NAME: ${{ github.event_name }}
+          GH_REF: ${{ github.ref }}
+        run: echo "$GH_REPO / $GH_EVENT_NAME / $GH_REF"
       - name: Download AppImage artifacts
         uses: actions/download-artifact@v3
       - name: Download all other artifacts
@@ -585,7 +597,7 @@ jobs:
     runs-on: ubuntu-latest
 
     if: |
-      (endsWith(${{ github.repository }}, 'sigrok-build') &&
+      (endsWith(github.repository, 'sigrok-build') &&
       (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')
     needs:
@@ -593,5 +605,9 @@ jobs:
       - continuous_release_sigrok-cli
 
     steps:
-      - name: Dummy
-        run: echo
+      - name: Debug output
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_EVENT_NAME: ${{ github.event_name }}
+          GH_REF: ${{ github.ref }}
+        run: echo "$GH_REPO / $GH_EVENT_NAME / $GH_REF"
