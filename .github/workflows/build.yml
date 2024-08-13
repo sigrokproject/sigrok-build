@@ -35,7 +35,12 @@ jobs:
   build_pulseview_mxe:
     name: PulseView MXE build (${{ matrix.target.target }}) (${{ matrix.build_type.type }})
 
+    if: |
+      ((endsWith(github.repository, 'pulseview')) ||
+      (endsWith(github.repository, 'sigrok-build')))
+
     runs-on: ubuntu-latest
+
     container:
       image: ghcr.io/sigrokproject/sigrok-mxe:latest
 
@@ -113,7 +118,12 @@ jobs:
   build_sigrok-cli_mxe:
     name: sigrok-cli MXE build (${{ matrix.target.target }})
 
+    if: |
+      ((endsWith(github.repository, 'sigrok-cli')) ||
+      (endsWith(github.repository, 'sigrok-build')))
+
     runs-on: ubuntu-latest
+
     container:
       image: ghcr.io/sigrokproject/sigrok-mxe:latest
 
@@ -182,7 +192,12 @@ jobs:
   build_pulseview_appimage:
     name: PulseView AppImage build (${{ matrix.target.target }}) (${{ matrix.build_type.type }})
 
+    if: |
+      ((endsWith(github.repository, 'pulseview')) ||
+      (endsWith(github.repository, 'sigrok-build')))
+
     runs-on: ubuntu-latest
+
     container:
       image: ghcr.io/sigrokproject/sigrok-appimage-${{ matrix.target.container }}:latest
 
@@ -282,7 +297,12 @@ jobs:
   build_sigrok-cli_appimage:
     name: sigrok-cli AppImage build (${{ matrix.target.target }})
 
+    if: |
+      ((endsWith(github.repository, 'sigrok-cli')) ||
+      (endsWith(github.repository, 'sigrok-build')))
+
     runs-on: ubuntu-latest
+
     container:
       image: ghcr.io/sigrokproject/sigrok-appimage-${{ matrix.target.container }}:latest
 
@@ -374,6 +394,10 @@ jobs:
   build_pulseview_macos:
     name: PulseView macOS build
 
+    if: |
+      ((endsWith(github.repository, 'pulseview')) ||
+      (endsWith(github.repository, 'sigrok-build')))
+
     runs-on: macos-12
 
 # Note: For now, we only supply debug builds
@@ -451,6 +475,10 @@ jobs:
   build_sigrok-cli_macos:
     name: sigrok-cli macOS build
 
+    if: |
+      ((endsWith(github.repository, 'sigrok-cli')) ||
+      (endsWith(github.repository, 'sigrok-build')))
+
     runs-on: macos-12
 
     env:
@@ -510,12 +538,14 @@ jobs:
 
   continuous_release_pulseview:
     name: Create continuous PulseView release and add artifacts to it
-    runs-on: ubuntu-latest
 
     if: |
       (endsWith(github.repository, 'pulseview')) &&
       ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'))
+
+    runs-on: ubuntu-latest
+
     needs:
       - build_pulseview_mxe
       - build_pulseview_appimage
@@ -553,12 +583,13 @@ jobs:
   continuous_release_sigrok-cli:
     name: Create continuous sigrok-cli release and add artifacts to it
 
-    runs-on: ubuntu-latest
-
     if: |
       (endsWith(github.repository, 'sigrok-cli')) &&
       ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'))
+
+    runs-on: ubuntu-latest
+
     needs:
       - build_sigrok-cli_mxe
       - build_sigrok-cli_appimage
@@ -594,12 +625,13 @@ jobs:
   continuous_release_all:
     name: Create continuous release and add artifacts to it
 
-    runs-on: ubuntu-latest
-
     if: |
       (endsWith(github.repository, 'sigrok-build')) &&
       (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')
+
+    runs-on: ubuntu-latest
+
     needs:
       - continuous_release_pulseview
       - continuous_release_sigrok-cli
