@@ -508,20 +508,54 @@ jobs:
           name: artifact-sigrok-cli-macos
           path: sigrok-build/ci/macos/sigrok-cli*.dmg
 
-  continuous_release:
-    name: Create continuous release and add artifacts to it
+  continous_release_pulseview:
+    name: Create continuous PulseView release and add artifacts to it
+    runs-on: ubuntu-latest
+
+    if: |
+      (endsWith(${{ github.repository }}, 'pulseview') &&
+      ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'))
+    needs:
+      - build_pulseview_mxe
+      - build_pulseview_appimage
+      - build_pulseview_macos
+
+    steps:
+      - name: Download AppImage artifacts
+        uses: actions/download-artifact@v3
+      - name: Download all other artifacts
+        uses: actions/download-artifact@v4
+      - name: Inspect directory after downloading artifacts
+        run: ls -alFR
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifact-pulseview-i686-debug-mxe/pulseview-*
+            artifact-pulseview-i686-release-mxe/pulseview-*
+            artifact-pulseview-x86_64-debug-mxe/pulseview-*
+            artifact-pulseview-x86_64-release-mxe/pulseview-*
+            artifact-pulseview-x86_64-appimage/pulseview-*
+            artifact-pulseview-macos/pulseview-*
+          tag_name: continuous
+          generate_release_notes: false
+          draft: false
+          fail_on_unmatched_files: true
+
+  continuous_release_sigrok-cli:
+    name: Create continuous sigrok-cli release and add artifacts to it
 
     runs-on: ubuntu-latest
 
     if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')
+      (endsWith(${{ github.repository }}, 'sigrok-cli') &&
+      ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'))
     needs:
-      - build_pulseview_mxe
       - build_sigrok-cli_mxe
-      - build_pulseview_appimage
       - build_sigrok-cli_appimage
-      - build_pulseview_macos
       - build_sigrok-cli_macos
 
     steps:
@@ -540,13 +574,20 @@ jobs:
             artifact-sigrok-cli-x86_64-mxe/sigrok-cli-*
             artifact-sigrok-cli-x86_64-appimage/sigrok-cli-*
             artifact-sigrok-cli-macos/sigrok-cli-*
-            artifact-pulseview-i686-debug-mxe/pulseview-*
-            artifact-pulseview-i686-release-mxe/pulseview-*
-            artifact-pulseview-x86_64-debug-mxe/pulseview-*
-            artifact-pulseview-x86_64-release-mxe/pulseview-*
-            artifact-pulseview-x86_64-appimage/pulseview-*
-            artifact-pulseview-macos/pulseview-*
           tag_name: continuous
           generate_release_notes: false
           draft: false
           fail_on_unmatched_files: true
+
+  continuous_release_all:
+    name: Create continuous release and add artifacts to it
+
+    runs-on: ubuntu-latest
+
+    if: |
+      (endsWith(${{ github.repository }}, 'sigrok-build') &&
+      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')
+    needs:
+      - continuous_release_pulseview
+      - continuous_release_sigrok-cli
