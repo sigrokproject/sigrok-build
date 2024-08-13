@@ -536,6 +536,7 @@ jobs:
           name: artifact-sigrok-cli-macos
           path: sigrok-build/ci/macos/sigrok-cli*.dmg
 
+
   continuous_release_pulseview:
     name: Create continuous PulseView release and add artifacts to it
 
@@ -552,12 +553,6 @@ jobs:
       - build_pulseview_macos
 
     steps:
-      - name: Debug output
-        env:
-          GH_REPO: ${{ github.repository }}
-          GH_EVENT_NAME: ${{ github.event_name }}
-          GH_REF: ${{ github.ref }}
-        run: echo "$GH_REPO / $GH_EVENT_NAME / $GH_REF"
       - name: Download AppImage artifacts
         uses: actions/download-artifact@v3
       - name: Download all other artifacts
@@ -580,6 +575,7 @@ jobs:
           draft: false
           fail_on_unmatched_files: true
 
+
   continuous_release_sigrok-cli:
     name: Create continuous sigrok-cli release and add artifacts to it
 
@@ -596,12 +592,6 @@ jobs:
       - build_sigrok-cli_macos
 
     steps:
-      - name: Debug output
-        env:
-          GH_REPO: ${{ github.repository }}
-          GH_EVENT_NAME: ${{ github.event_name }}
-          GH_REF: ${{ github.ref }}
-        run: echo "$GH_REPO / $GH_EVENT_NAME / $GH_REF"
       - name: Download AppImage artifacts
         uses: actions/download-artifact@v3
       - name: Download all other artifacts
@@ -622,6 +612,7 @@ jobs:
           draft: false
           fail_on_unmatched_files: true
 
+
   continuous_release_all:
     name: Create continuous release and add artifacts to it
 
@@ -638,8 +629,19 @@ jobs:
 
     steps:
       - name: Debug output
+        run: echo
+
+
+  debug_output:
+    name: Debug output
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Debug output
         env:
           GH_REPO: ${{ github.repository }}
           GH_EVENT_NAME: ${{ github.event_name }}
           GH_REF: ${{ github.ref }}
-        run: echo "$GH_REPO / $GH_EVENT_NAME / $GH_REF"
+        run: echo "Repo: $GH_REPO / Event: $GH_EVENT_NAME / Ref: $GH_REF"
+
