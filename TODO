@@ -1,4 +1,7 @@
 
+- Add workaround for "hdiutil: create failed - Resource busy" bug on MacOS
+	See https://github.com/actions/runner-images/issues/7522
+
 - On push to master, update continuous builds
 	Ignore paths, see https://github.com/knarfS/smuview/blob/master/.github/workflows/build.yml
 

@@ -1,7 +1,7 @@
 FROM debian:latest AS sigrok-mxe
 LABEL \
 	org.opencontainers.image.title="sigrok MXE Build Image" \	
-	org.opencontainers.image.description="This image is used to cross compile the sigrok artefacts for Windows with MXE" \
+	org.opencontainers.image.description="This image is used to cross compile the sigrok artifacts for Windows with MXE" \
 	org.opencontainers.image.url="https://sigrok.org" \
 	org.opencontainers.image.source="https://github.com/sigrokproject/sigrok-build" \
 	org.opencontainers.image.licenses="GPL-3.0-or-later" \

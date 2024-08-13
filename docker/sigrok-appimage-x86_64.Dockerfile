@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 LABEL \
 	org.opencontainers.image.title="sigrok AppImage x86_64 Build Image" \
-	org.opencontainers.image.description="This image is used to build the sigrok x86_64 AppImage artefacts" \
+	org.opencontainers.image.description="This image is used to build the sigrok x86_64 AppImage artifacts" \
 	org.opencontainers.image.url="https://sigrok.org" \
 	org.opencontainers.image.source="https://github.com/sigrokproject/sigrok-build" \
 	org.opencontainers.image.licenses="GPL-3.0-or-later" \
