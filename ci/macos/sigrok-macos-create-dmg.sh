@@ -32,8 +32,8 @@ QT_VER_PATH=$(echo $QT_VER | sed 's# #/#')
 
 # Path to Qt5 binaries
 QT_BIN_DIR=$(brew list "$BREW_QT_VERSION" | grep bin | head -n 1 | xargs dirname)
-QT_TRANSLATIONS_DIR=$(brew --cellar)/$QT_VER_PATH/share/qt/translations
-
+QT_DIR=$(brew --cellar)/$QT_VER_PATH
+QT_TRANSLATIONS_DIR=$QT_DIR/share/qt/translations
 
 # Path to Python 3 framework
 PYTHON_FRAMEWORK_DIR=$(brew list "$BREW_PYTHON_VERSION" | grep Python.framework/Python | head -n 1 | xargs dirname)
@@ -73,6 +73,9 @@ if [ "$ARTIFACT_BIN_NAME" = "pulseview" ]; then
 	# cp $BOOSTLIBDIR/libboost_timer-mt.dylib $FRAMEWORKS_DIR
 	# cp $BOOSTLIBDIR/libboost_chrono-mt.dylib $FRAMEWORKS_DIR
 	# chmod 644 $FRAMEWORKS_DIR/*boost*
+
+	# Copy QtDBus framework files
+	cp -r $QT_DIR/Frameworks/QtDBus.framework $FRAMEWORKS_DIR/
 fi
 
 "$QT_BIN_DIR"/macdeployqt $ARTIFACT_TITLE.app
