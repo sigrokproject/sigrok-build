@@ -20,11 +20,17 @@
 
 - On push to master, create reports using clang-tidy
 
-- On push to libsigrok PR, check for style issues using clang-format
-	https://github.com/knarfS/libsigrok/tree/clang-format_v1
+- On push to libsigrok PR, check for style issues using uncrustify
 
 - On PR creation, post submission process hint
 
-- On PR creation, build binaries for that PR and attach them to the PR
+- On PR creation and synchronization, perform unit tests and PD tests where applicable (determined by repo)
 
-- On PR creation, perform unit tests and PD tests
+- Figure out how to create and upload tarballs to tag releases
+
+- Figure out how to manually trigger build of a tag release
+
+- Provide build workflow for sigrok-firmware
+
+- Provide release build workflow for sigrok-firmware (i.e. tags, tarballs)
+
