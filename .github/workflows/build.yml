@@ -338,9 +338,10 @@ jobs:
 
     steps:
       - name: Update node to 20
-        run: |
-          sudo nvm install 20
-          sudo nvm use 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: Update dependencies
         run: |
           sudo apt-get update
