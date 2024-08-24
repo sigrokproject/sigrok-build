@@ -334,7 +334,7 @@ jobs:
       ARTIFACT_BIN_NAME: "sigrok-cli"
       ARTIFACT_VERSION: "NIGHTLY"
       # See https://github.com/actions/checkout/issues/1590#issuecomment-2219382750
-      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+#      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
     steps:
       - name: Update dependencies
@@ -358,7 +358,7 @@ jobs:
           ./sigrok-appimage-build-dependencies.sh
 
       - name: Checkout sigrok-cli
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: sigrokproject/sigrok-cli
           path: sigrok-cli
