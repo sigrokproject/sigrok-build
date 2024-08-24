@@ -385,10 +385,33 @@ jobs:
           mv sigrok-cli-*.AppImage sigrok-cli-NIGHTLY-${{ matrix.target.target }}-debug.appimage
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        id: upload_sigrok-cli_appimage_artifact
+        uses: actions/upload-artifact@v4
         with:
           name: artifact-sigrok-cli-x86_64-appimage
           path: sigrok-build/ci/appimage/appimage-build/sigrok-cli-*.appimage
+
+      - name: Output artifact URL
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo 'Artifact URL is ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}'
+
+      - name: Add artifact message to pull request
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        uses: actions/github-script@v7
+        env:
+          PR_NOTES: |
+            sigrok-cli AppImage created: ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: ${{ github.event.pull_request.number }}
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: process.env.PR_NOTES
+            })
 
 
   build_pulseview_macos:
