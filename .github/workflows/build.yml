@@ -301,7 +301,7 @@ jobs:
       ((endsWith(github.repository, 'sigrok-cli')) ||
       (endsWith(github.repository, 'sigrok-build')))
 
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     container:
       image: ghcr.io/sigrokproject/sigrok-appimage-${{ matrix.target.container }}:latest
@@ -333,15 +333,8 @@ jobs:
       ARTIFACT_TITLE: "sigrok-cli"
       ARTIFACT_BIN_NAME: "sigrok-cli"
       ARTIFACT_VERSION: "NIGHTLY"
-      # See https://github.com/actions/checkout/issues/1590#issuecomment-2219382750
-#      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
     steps:
-      - name: Update node to 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
       - name: Update dependencies
         run: |
           sudo apt-get update
