@@ -353,11 +353,23 @@ jobs:
           source sigrok-appimage-init-toolchain.sh
           ./sigrok-appimage-build-dependencies.sh
 
-      - name: Checkout sigrok-cli
+      - name: Checkout sigrok's sigrok-cli
+        # Check out default sigrok-cli repository unless we're processing a pull request
+        if: (github.event_name != 'pull_request')
         uses: actions/checkout@v4
         with:
           repository: sigrokproject/sigrok-cli
           path: sigrok-cli
+
+      - name: Checkout sigrok-cli from PR
+        # Check out sigrok-cli branch of the pull request we're processing
+        if: (github.event_name == 'pull_request')
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          path: sigrok-cli
+          fetch-depth: 0
 
       - name: Build sigrok-cli
         run: |
