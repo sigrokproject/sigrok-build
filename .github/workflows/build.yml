@@ -288,7 +288,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: artifact-pulseview-${{ matrix.target.target }}-appimage
+          name: artifact-pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-appimage
           path: sigrok-build/ci/appimage/appimage-build/pulseview-*.appimage
 
 
@@ -597,7 +597,8 @@ jobs:
             artifact-pulseview-i686-release-mxe/pulseview-*
             artifact-pulseview-x86_64-debug-mxe/pulseview-*
             artifact-pulseview-x86_64-release-mxe/pulseview-*
-            artifact-pulseview-x86_64-appimage/pulseview-*
+            artifact-pulseview-x86_64-debug-appimage/pulseview-*
+            artifact-pulseview-x86_64-release-appimage/pulseview-*
             artifact-pulseview-macos/pulseview-*
           tag_name: continuous
           generate_release_notes: false
