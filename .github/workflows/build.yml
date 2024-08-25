@@ -239,7 +239,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get upgrade -y
-          # Temp!
+          # Version must match the one in ci/appimage/sigrok-appimage-create-appimage.sh
           sudo apt-get install -y python3.8-dev
 
       - name: Checkout sigrok-build
@@ -339,7 +339,7 @@ jobs:
           sudo apt-get upgrade -y
           # Temp!
           sudo apt-get install -y libffi-dev
-          # Temp!
+          # Version must match the one in ci/appimage/sigrok-appimage-create-appimage.sh
           sudo apt-get install -y python3.8-dev
 
       - name: Checkout sigrok-build
