@@ -240,9 +240,7 @@ jobs:
           sudo apt-get update
           sudo apt-get upgrade -y
           # Temp!
-          sudo apt-get install -y python3.6-dev
-          # Temp!
-          sudo apt-get install -y libboost-system1.65-dev libboost-filesystem1.65-dev libboost-serialization1.65-dev
+          sudo apt-get install -y python3-dev
 
       - name: Checkout sigrok-build
         # Cannot use actions/checkout because it always checks out the calling actions' repo, not the one specified
@@ -342,7 +340,7 @@ jobs:
           # Temp!
           sudo apt-get install -y libffi-dev
           # Temp!
-          sudo apt-get install -y python3.6-dev
+          sudo apt-get install -y python3-dev
 
       - name: Checkout sigrok-build
         # Cannot use actions/checkout because it always checks out the calling actions' repo, not the one specified
