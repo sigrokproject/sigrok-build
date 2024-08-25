@@ -131,6 +131,22 @@ jobs:
           name: artifact-pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-mxe
           path: pulseview/build/contrib/pulseview*installer.exe
 
+      - name: Add artifact message to pull request
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        uses: actions/github-script@v7
+        env:
+          PR_NOTES: |
+            pulseview-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-${{ matrix.build_type.name }}-installer.exe created: ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: ${{ github.event.pull_request.number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: process.env.PR_NOTES
+            })
+
 
   build_sigrok-cli_mxe:
     name: sigrok-cli MXE build (${{ matrix.target.target }})
@@ -222,6 +238,22 @@ jobs:
         with:
           name: artifact-sigrok-cli-${{ matrix.target.target }}-mxe
           path: sigrok-cli/contrib/sigrok-cli*installer.exe
+
+      - name: Add artifact message to pull request
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        uses: actions/github-script@v7
+        env:
+          PR_NOTES: |
+            sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug-installer.exe created: ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: ${{ github.event.pull_request.number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: process.env.PR_NOTES
+            })
 
 
   build_pulseview_appimage:
@@ -341,6 +373,22 @@ jobs:
           name: artifact-pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-appimage
           path: sigrok-build/ci/appimage/appimage-build/pulseview-*.appimage
 
+      - name: Add artifact message to pull request
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        uses: actions/github-script@v7
+        env:
+          PR_NOTES: |
+            pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-appimage created: ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: ${{ github.event.pull_request.number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: process.env.PR_NOTES
+            })
+
 
   build_sigrok-cli_appimage:
     name: sigrok-cli AppImage build (${{ matrix.target.target }})
@@ -451,7 +499,7 @@ jobs:
         id: upload_sigrok-cli_appimage_artifact
         uses: actions/upload-artifact@v4
         with:
-          name: artifact-sigrok-cli-x86_64-appimage
+          name: artifact-sigrok-cli-${{ matrix.target.target }}-appimage
           path: sigrok-build/ci/appimage/appimage-build/sigrok-cli-*.appimage
 
       - name: Output artifact URL to log
@@ -466,7 +514,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           PR_NOTES: |
-            sigrok-cli ${{ matrix.target.target }} AppImage created: ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}
+            sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug.appimage created: ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}
         with:
           script: |
             github.rest.issues.createComment({
@@ -573,6 +621,22 @@ jobs:
           name: artifact-pulseview-macos
           path: sigrok-build/ci/macos/pulseview*.dmg
 
+      - name: Add artifact message to pull request
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        uses: actions/github-script@v7
+        env:
+          PR_NOTES: |
+            pulseview-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg created: ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: ${{ github.event.pull_request.number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: process.env.PR_NOTES
+            })
+
 
   build_sigrok-cli_macos:
     name: sigrok-cli macOS build
@@ -653,6 +717,22 @@ jobs:
         with:
           name: artifact-sigrok-cli-macos
           path: sigrok-build/ci/macos/sigrok-cli*.dmg
+
+      - name: Add artifact message to pull request
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        uses: actions/github-script@v7
+        env:
+          PR_NOTES: |
+            sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg created: ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: ${{ github.event.pull_request.number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: process.env.PR_NOTES
+            })
 
 
   continuous_release_pulseview:
