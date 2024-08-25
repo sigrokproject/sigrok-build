@@ -61,6 +61,11 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     steps:
+      - name: Set artifact version to PR
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "ARTIFACT_VERSION=PR${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
       - name: Checkout sigrok-build
         # Cannot use actions/checkout because it always checks out the calling actions' repo, not the one specified
         run: |
@@ -72,12 +77,23 @@ jobs:
           source sigrok-mxe-init-toolchain.sh
           ./sigrok-mxe-build-dependencies.sh
 
-      - name: Checkout PulseView
+      - name: Checkout sigrok's PulseView
+        # Check out default PV repository unless we're processing a pull request
         uses: actions/checkout@v4
         with:
           # TODO: Clone from sigrok.org
           repository: sigrokproject/pulseview
           path: pulseview
+
+      - name: Checkout PulseView from PR
+        # Check out PV branch of the pull request we're processing
+        if: (github.event_name == 'pull_request')
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          path: pulseview
+          fetch-depth: 0
 
       - name: Build PulseView
         run: |
@@ -142,6 +158,11 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     steps:
+      - name: Set artifact version to PR
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "ARTIFACT_VERSION=PR${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
       - name: Checkout sigrok-build
         # Cannot use actions/checkout because it always checks out the calling actions' repo, not the one specified
         run: |
@@ -153,11 +174,23 @@ jobs:
           source sigrok-mxe-init-toolchain.sh
           ./sigrok-mxe-build-dependencies.sh
 
-      - name: Checkout sigrok-cli
+      - name: Checkout sigrok's sigrok-cli
+        # Check out default sigrok-cli repository unless we're processing a pull request
+        if: (github.event_name != 'pull_request')
         uses: actions/checkout@v4
         with:
           repository: sigrokproject/sigrok-cli
           path: sigrok-cli
+
+      - name: Checkout sigrok-cli from PR
+        # Check out sigrok-cli branch of the pull request we're processing
+        if: (github.event_name == 'pull_request')
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          path: sigrok-cli
+          fetch-depth: 0
 
       - name: Build sigrok-cli
         run: |
@@ -235,6 +268,11 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     steps:
+      - name: Set artifact version to PR
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "ARTIFACT_VERSION=PR${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
       - name: Update dependencies
         run: |
           sudo apt-get update
@@ -253,11 +291,23 @@ jobs:
           source sigrok-appimage-init-toolchain.sh
           ./sigrok-appimage-build-dependencies.sh
 
-      - name: Checkout PulseView
+      - name: Checkout sigrok's PulseView
+        # Check out default PV repository unless we're processing a pull request
         uses: actions/checkout@v4
         with:
+          # TODO: Clone from sigrok.org
           repository: sigrokproject/pulseview
           path: pulseview
+
+      - name: Checkout PulseView from PR
+        # Check out PV branch of the pull request we're processing
+        if: (github.event_name == 'pull_request')
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          path: pulseview
+          fetch-depth: 0
 
       - name: Build PulseView
         run: |
@@ -333,6 +383,11 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     steps:
+      - name: Set artifact version to PR
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "ARTIFACT_VERSION=PR${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
       - name: Update dependencies
         run: |
           sudo apt-get update
@@ -448,6 +503,11 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     steps:
+      - name: Set artifact version to PR
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "ARTIFACT_VERSION=PR${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
       - name: Install dependencies
         run: |
           brew install autoconf automake autoconf-archive pkg-config libtool \
@@ -469,12 +529,23 @@ jobs:
           source sigrok-macos-init-toolchain.sh
           ./sigrok-macos-build-dependencies.sh
 
-      - name: Checkout PulseView
+      - name: Checkout sigrok's PulseView
+        # Check out default PV repository unless we're processing a pull request
         uses: actions/checkout@v4
         with:
           # TODO: Clone from sigrok.org
           repository: sigrokproject/pulseview
           path: pulseview
+
+      - name: Checkout PulseView from PR
+        # Check out PV branch of the pull request we're processing
+        if: (github.event_name == 'pull_request')
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          path: pulseview
+          fetch-depth: 0
 
       - name: Build PulseView
         run: |
@@ -522,6 +593,11 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     steps:
+      - name: Set artifact version to PR
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "ARTIFACT_VERSION=PR${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
       - name: Install dependencies
         run: |
           brew install autoconf automake autoconf-archive pkg-config sdcc \
@@ -539,12 +615,23 @@ jobs:
           source sigrok-macos-init-toolchain.sh
           ./sigrok-macos-build-dependencies.sh
 
-      - name: Checkout sigrok-cli
+      - name: Checkout sigrok's sigrok-cli
+        # Check out default sigrok-cli repository unless we're processing a pull request
+        if: (github.event_name != 'pull_request')
         uses: actions/checkout@v4
         with:
-          # TODO: Clone from sigrok.org
           repository: sigrokproject/sigrok-cli
           path: sigrok-cli
+
+      - name: Checkout sigrok-cli from PR
+        # Check out sigrok-cli branch of the pull request we're processing
+        if: (github.event_name == 'pull_request')
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          path: sigrok-cli
+          fetch-depth: 0
 
       - name: Build sigrok-cli
         run: |
