@@ -240,7 +240,7 @@ jobs:
           sudo apt-get update
           sudo apt-get upgrade -y
           # Temp!
-          sudo apt-get install -y python3-dev
+          sudo apt-get install -y python3.8-dev
 
       - name: Checkout sigrok-build
         # Cannot use actions/checkout because it always checks out the calling actions' repo, not the one specified
@@ -340,7 +340,7 @@ jobs:
           # Temp!
           sudo apt-get install -y libffi-dev
           # Temp!
-          sudo apt-get install -y python3-dev
+          sudo apt-get install -y python3.8-dev
 
       - name: Checkout sigrok-build
         # Cannot use actions/checkout because it always checks out the calling actions' repo, not the one specified

@@ -41,9 +41,7 @@ cp -r "$INSTALL_DIR"/share/sigrok-firmware "$APP_DIR"/usr/share
 
 # Copy extra Python files
 mkdir -p "$APP_DIR"/usr/share/pyshared
-# Find local python path of the latest version, e.g. /usr/lib/python3.12
-export LOCAL_PYTHON_PATH=`find /usr/lib -maxdepth 1 -iname "python3*" | sort -V | tail -n 1`
-cp -r $LOCAL_PYTHON_PATH/* "$APP_DIR"/usr/share/pyshared
+cp -r /usr/lib/python3.8/* "$APP_DIR"/usr/share/pyshared
 
 # AppImage build dir
 mkdir -p appimage-build
