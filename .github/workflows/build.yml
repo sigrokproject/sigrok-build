@@ -126,6 +126,7 @@ jobs:
           mv pulseview-*installer.exe pulseview-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-${{ matrix.build_type.name }}-installer.exe
 
       - name: Upload artifact
+        id: upload_pulseview_${{ matrix.target.target }}_${{ matrix.build_type.name }}_mxe_artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-mxe
@@ -137,7 +138,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           PR_NOTES: |
-            pulseview-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-${{ matrix.build_type.name }}-installer.exe created: ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}
+            pulseview-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-${{ matrix.build_type.name }}-installer.exe created: ${{ env[format('steps.upload_pulseview-{0}_{1}_mxe_artifact.outputs.artifact-url', matrix.target.target, matrix.build_type.name)] }}
         with:
           script: |
             github.rest.issues.createComment({
@@ -234,6 +235,7 @@ jobs:
           mv sigrok-cli-*installer.exe sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug-installer.exe
 
       - name: Upload artifact
+        id: upload_sigrok-cli_${{ matrix.target.target }}_debug_mxe_artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-sigrok-cli-${{ matrix.target.target }}-mxe
@@ -245,7 +247,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           PR_NOTES: |
-            sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug-installer.exe created: ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}
+            sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug-installer.exe created: ${{ env[format('steps.upload_sigrok-cli_{0}_debug_mxe_artifact.outputs.artifact-url', matrix.target.target)] }}
         with:
           script: |
             github.rest.issues.createComment({
@@ -368,6 +370,7 @@ jobs:
           mv PulseView-*.AppImage pulseview-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-${{ matrix.build_type.name }}.appimage
 
       - name: Upload artifact
+        id: upload_pulseview_${{ matrix.target.target }}_${{ matrix.build_type.name }}_appimage_artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-appimage
@@ -379,7 +382,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           PR_NOTES: |
-            pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-appimage created: ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}
+            pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-appimage created: ${{ env[format('steps.upload_pulseview-{0}_{1}_appimage_artifact.outputs.artifact-url', matrix.target.target, matrix.build_type.name)] }}
         with:
           script: |
             github.rest.issues.createComment({
@@ -496,7 +499,7 @@ jobs:
           mv sigrok-cli-*.AppImage sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug.appimage
 
       - name: Upload artifact
-        id: upload_sigrok-cli_appimage_artifact
+        id: upload_sigrok-cli_${{ matrix.target.target }}_appimage_artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-sigrok-cli-${{ matrix.target.target }}-appimage
@@ -514,7 +517,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           PR_NOTES: |
-            sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug.appimage created: ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}
+            sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug.appimage created: ${{ env[format('steps.upload_sigrok-cli_{0}_appimage_artifact.outputs.artifact-url', matrix.target.target)] }}
         with:
           script: |
             github.rest.issues.createComment({
@@ -616,6 +619,7 @@ jobs:
           ./sigrok-macos-create-dmg.sh
 
       - name: Upload artifact
+        id: upload_pulseview_dmg_artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-pulseview-macos
@@ -627,7 +631,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           PR_NOTES: |
-            pulseview-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg created: ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}
+            pulseview-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg created: ${{ steps.upload_pulseview_appimage_artifact.outputs.artifact-url }}
         with:
           script: |
             github.rest.issues.createComment({
@@ -713,6 +717,7 @@ jobs:
           ./sigrok-macos-create-dmg.sh
 
       - name: Upload artifact
+        id: upload_sigrok-cli_dmg_artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-sigrok-cli-macos
@@ -724,7 +729,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           PR_NOTES: |
-            sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg created: ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}
+            sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg created: ${{ steps.upload_sigrok-cli_dmg_artifact.outputs.artifact-url', matrix.target.target }}
         with:
           script: |
             github.rest.issues.createComment({
