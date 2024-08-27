@@ -687,6 +687,7 @@ jobs:
     runs-on: ubuntu-latest
 
     needs:
+      # Keep in sync with job announce_pv_builds_in_pr
       - build_pulseview_mxe
       - build_pulseview_appimage
       - build_pulseview_macos
@@ -724,6 +725,7 @@ jobs:
     runs-on: ubuntu-latest
 
     needs:
+      # Keep in sync with job announce_sigrok-cli_builds_in_pr
       - build_sigrok-cli_mxe
       - build_sigrok-cli_appimage
       - build_sigrok-cli_macos
@@ -767,14 +769,52 @@ jobs:
 
 
   announce_pv_builds_in_pr:
-    name: Announce builds in PR
+    name: Announce PV builds in PR
 
     if: (github.event_name == 'pull_request')
 
     runs-on: ubuntu-latest
 
     needs:
-      - continuous_release_pulseview
+      # Keep in sync with job continuous_release_pulseview
+      - build_pulseview_mxe
+      - build_pulseview_appimage
+      - build_pulseview_macos
+
+    steps:
+      - name: Post comment to PR
+        uses: actions/github-script@v7
+        env:
+          PR_COMMENT: |-
+            ## PulseView binaries created
+
+            | Build | Link |
+            ---------------------------------------------------
+            ${{ env.PR_LINKS }}
+
+            Note: Binaries are removed after 90 days. If necessary, re-trigger a build by commenting '/build'.
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: ${{ github.event.pull_request.number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: process.env.PR_COMMENT
+            })
+
+
+  announce_sigrok-cli_builds_in_pr:
+    name: Announce sigrok-cli builds in PR
+
+    if: (github.event_name == 'pull_request')
+
+    runs-on: ubuntu-latest
+
+    needs:
+      # Keep in sync with job continuous_release_pulseview
+      - build_sigrok-cli_mxe
+      - build_sigrok-cli_appimage
+      - build_sigrok-cli_macos
 
     steps:
       - name: Post comment to PR
