@@ -61,6 +61,9 @@ jobs:
       WGET: "wget -c --quiet --no-check-certificate"
       ARTIFACT_VERSION: "NIGHTLY"
 
+    outputs:
+      pr-links: ${{ steps.pr_links.outputs.PR_LINKS }}
+
     steps:
       - name: Set artifact version to PR
         if: (github.event_name == 'pull_request')
@@ -134,10 +137,11 @@ jobs:
           path: pulseview/build/contrib/pulseview*installer.exe
 
       - name: Add artifact to pull request message
+        id: pr_links
         # Only relevant for pull requests
         if: (github.event_name == 'pull_request')
         run: |
-          echo "PR_LINKS=$PR_LINKS | pulseview-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-${{ matrix.build_type.name }}-installer.exe | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_ENV
+          echo "PR_LINKS=$PR_LINKS | pulseview-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-${{ matrix.build_type.name }}-installer.exe | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_OUTPUT
 
 
   build_sigrok-cli_mxe:
@@ -164,6 +168,9 @@ jobs:
       # When downloading python from sigrok.org, smth is wrong with the cert
       WGET: "wget -c --quiet --no-check-certificate"
       ARTIFACT_VERSION: "NIGHTLY"
+
+    outputs:
+      pr-links: ${{ steps.pr_links.outputs.PR_LINKS }}
 
     steps:
       - name: Set artifact version to PR
@@ -233,10 +240,11 @@ jobs:
           path: sigrok-cli/contrib/sigrok-cli*installer.exe
 
       - name: Add artifact to pull request message
+        id: pr_links
         # Only relevant for pull requests
         if: (github.event_name == 'pull_request')
         run: |
-          echo "PR_LINKS=$PR_LINKS | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug-installer.exe | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_ENV
+          echo "PR_LINKS=$PR_LINKS | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug-installer.exe | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_OUTPUT
 
 
   build_pulseview_appimage:
@@ -282,6 +290,9 @@ jobs:
       ARTIFACT_TITLE: "PulseView"
       ARTIFACT_BIN_NAME: "pulseview"
       ARTIFACT_VERSION: "NIGHTLY"
+
+    outputs:
+      pr-links: ${{ steps.pr_links.outputs.PR_LINKS }}
 
     steps:
       - name: Set artifact version to PR
@@ -359,10 +370,11 @@ jobs:
           path: sigrok-build/ci/appimage/appimage-build/pulseview-*.appimage
 
       - name: Add artifact to pull request message
+        id: pr_links
         # Only relevant for pull requests
         if: (github.event_name == 'pull_request')
         run: |
-          echo "PR_LINKS=$PR_LINKS | pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-appimage | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_ENV
+          echo "PR_LINKS=$PR_LINKS | pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-appimage | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_OUTPUT
 
 
   build_sigrok-cli_appimage:
@@ -404,6 +416,9 @@ jobs:
       ARTIFACT_TITLE: "sigrok-cli"
       ARTIFACT_BIN_NAME: "sigrok-cli"
       ARTIFACT_VERSION: "NIGHTLY"
+
+    outputs:
+      pr-links: ${{ steps.pr_links.outputs.PR_LINKS }}
 
     steps:
       - name: Set artifact version to PR
@@ -478,10 +493,11 @@ jobs:
           path: sigrok-build/ci/appimage/appimage-build/sigrok-cli-*.appimage
 
       - name: Add artifact to pull request message
+        id: pr_links
         # Only relevant for pull requests
         if: (github.event_name == 'pull_request')
         run: |
-          echo "PR_LINKS=$PR_LINKS | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug.appimage | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_ENV
+          echo "PR_LINKS=$PR_LINKS | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug.appimage | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_OUTPUT
 
 
   build_pulseview_macos:
@@ -508,6 +524,9 @@ jobs:
       ARTIFACT_TITLE: "pulseview"
       ARTIFACT_BIN_NAME: "pulseview"
       ARTIFACT_VERSION: "NIGHTLY"
+
+    outputs:
+      pr-links: ${{ steps.pr_links.outputs.PR_LINKS }}
 
     steps:
       - name: Set artifact version to PR
@@ -582,10 +601,11 @@ jobs:
           path: sigrok-build/ci/macos/pulseview*.dmg
 
       - name: Add artifact to pull request message
+        id: pr_links
         # Only relevant for pull requests
         if: (github.event_name == 'pull_request')
         run: |
-          echo "PR_LINKS=$PR_LINKS | pulseview-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_ENV
+          echo "PR_LINKS=$PR_LINKS | pulseview-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_OUTPUT
 
 
   build_sigrok-cli_macos:
@@ -605,6 +625,9 @@ jobs:
       ARTIFACT_TITLE: "sigrok-cli"
       ARTIFACT_BIN_NAME: "sigrok-cli"
       ARTIFACT_VERSION: "NIGHTLY"
+
+    outputs:
+      pr-links: ${{ steps.pr_links.outputs.PR_LINKS }}
 
     steps:
       - name: Set artifact version to PR
@@ -670,10 +693,11 @@ jobs:
           path: sigrok-build/ci/macos/sigrok-cli*.dmg
 
       - name: Add artifact to pull request message
+        id: pr_links
         # Only relevant for pull requests
         if: (github.event_name == 'pull_request')
         run: |
-          echo "PR_LINKS=$PR_LINKS | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_ENV
+          echo "PR_LINKS=$PR_LINKS | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_OUTPUT
 
 
   continuous_release_pulseview:
@@ -776,7 +800,7 @@ jobs:
     runs-on: ubuntu-latest
 
     needs:
-      # Keep in sync with job continuous_release_pulseview
+      # Keep in sync with job continuous_release_pulseview and see below, too
       - build_pulseview_mxe
       - build_pulseview_appimage
       - build_pulseview_macos
@@ -790,7 +814,9 @@ jobs:
 
             | Build | Link |
             ---------------------------------------------------
-            ${{ env.PR_LINKS }}
+            ${{ needs.build_pulseview_appimage.outputs.pr_links }}
+            ${{ needs.build_pulseview_mxe.outputs.pr_links }}
+            ${{ needs.build_pulseview_macos.outputs.pr_links }}
 
             Note: Binaries are removed after 90 days. If necessary, re-trigger a build by commenting '/build'.
         with:
@@ -811,7 +837,7 @@ jobs:
     runs-on: ubuntu-latest
 
     needs:
-      # Keep in sync with job continuous_release_pulseview
+      # Keep in sync with job continuous_release_pulseview and see below, too
       - build_sigrok-cli_mxe
       - build_sigrok-cli_appimage
       - build_sigrok-cli_macos
@@ -825,7 +851,9 @@ jobs:
 
             | Build | Link |
             ---------------------------------------------------
-            ${{ env.PR_LINKS }}
+            ${{ needs.build_sigrok-cli_appimage.outputs.pr_links }}
+            ${{ needs.build_sigrok-cli_mxe.outputs.pr_links }}
+            ${{ needs.build_sigrok-cli_macos.outputs.pr_links }}
 
             Note: Binaries are removed after 90 days. If necessary, re-trigger a build by commenting '/build'.
         with:
