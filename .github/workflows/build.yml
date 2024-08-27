@@ -1,4 +1,4 @@
-name: Reusable sigrok Artifact Builder Workflows
+name: Build sigrok artifacts
 
 on:
   push:
@@ -133,6 +133,12 @@ jobs:
           name: artifact-pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-mxe
           path: pulseview/build/contrib/pulseview*installer.exe
 
+      - name: Add artifact to pull request message
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "PR_LINKS=$PR_LINKS | pulseview-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-${{ matrix.build_type.name }}-installer.exe | ${{ env[format('steps.upload_pulseview-{0}_{1}_mxe_artifact.outputs.artifact-url', env.TARGET, env.BUILD_TYPE)] }}" >> $GITHUB_ENV
+
 
   build_sigrok-cli_mxe:
     name: sigrok-cli MXE build (${{ matrix.target.target }})
@@ -225,6 +231,12 @@ jobs:
         with:
           name: artifact-sigrok-cli-${{ matrix.target.target }}-mxe
           path: sigrok-cli/contrib/sigrok-cli*installer.exe
+
+      - name: Add artifact to pull request message
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "PR_LINKS=$PR_LINKS | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug-installer.exe | ${{ env[format('steps.upload_sigrok-cli_{0}_debug_mxe_artifact.outputs.artifact-url', env.TARGET)] }}" >> $GITHUB_ENV
 
 
   build_pulseview_appimage:
@@ -346,6 +358,12 @@ jobs:
           name: artifact-pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-appimage
           path: sigrok-build/ci/appimage/appimage-build/pulseview-*.appimage
 
+      - name: Add artifact to pull request message
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "PR_LINKS=$PR_LINKS | pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-appimage | ${{ env[format('steps.upload_pulseview-{0}_{1}_appimage_artifact.outputs.artifact-url', env.TARGET, env.BUILD_TYPE)] }}" >> $GITHUB_ENV
+
 
   build_sigrok-cli_appimage:
     name: sigrok-cli AppImage build (${{ matrix.target.target }})
@@ -465,6 +483,12 @@ jobs:
         run: |
           echo 'Artifact URL is ${{ steps.upload_sigrok-cli_appimage_artifact.outputs.artifact-url }}'
 
+      - name: Add artifact to pull request message
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "PR_LINKS=$PR_LINKS | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug.appimage | ${{ env[format('steps.upload_sigrok-cli_{0}_appimage_artifact.outputs.artifact-url', env.TARGET)] }}" >> $GITHUB_ENV
+
 
   build_pulseview_macos:
     name: PulseView macOS build
@@ -563,6 +587,12 @@ jobs:
           name: artifact-pulseview-macos
           path: sigrok-build/ci/macos/pulseview*.dmg
 
+      - name: Add artifact to pull request message
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "PR_LINKS=$PR_LINKS | pulseview-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg | ${{ steps.upload_pulseview_appimage_artifact.outputs.artifact-url }}" >> $GITHUB_ENV
+
 
   build_sigrok-cli_macos:
     name: sigrok-cli macOS build
@@ -644,6 +674,12 @@ jobs:
         with:
           name: artifact-sigrok-cli-macos
           path: sigrok-build/ci/macos/sigrok-cli*.dmg
+
+      - name: Add artifact to pull request message
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "PR_LINKS=$PR_LINKS | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg | ${{ steps.upload_sigrok-cli_dmg_artifact.outputs.artifact-url', matrix.target.target }}" >> $GITHUB_ENV
 
 
   continuous_release_pulseview:
@@ -736,6 +772,38 @@ jobs:
     steps:
       - name: Debug output
         run: echo
+
+
+  announce_pv_builds_in_pr:
+    name: Announce builds in PR
+
+    if: (github.event_name == 'pull_request')
+
+    runs-on: ubuntu-latest
+
+    needs:
+      - continuous_release_pulseview
+
+    steps:
+      - name: Post comment to PR
+        uses: actions/github-script@v7
+        env:
+          PR_COMMENT: |-
+            ## PulseView binaries created
+
+            | Build | Link |
+            ---------------------------------------------------
+            ${{ env.PR_LINKS }}
+
+            Note: Binaries are removed after 90 days. If necessary, re-trigger a build by commenting '/build'.
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: ${{ github.event.pull_request.number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: process.env.PR_COMMENT
+            })
 
 
   debug_output:
