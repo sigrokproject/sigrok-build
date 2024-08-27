@@ -127,7 +127,6 @@ jobs:
           mv pulseview-*installer.exe pulseview-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-${{ matrix.build_type.name }}-installer.exe
 
       - name: Upload artifact
-        id: upload_pulseview_${{ env.TARGET }}_${{ env.BUILD_TYPE }}_mxe_artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-mxe
@@ -226,7 +225,6 @@ jobs:
           mv sigrok-cli-*installer.exe sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug-installer.exe
 
       - name: Upload artifact
-        id: upload_sigrok-cli_${{ env.TARGET }}_debug_mxe_artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-sigrok-cli-${{ matrix.target.target }}-mxe
@@ -352,7 +350,6 @@ jobs:
           mv PulseView-*.AppImage pulseview-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-${{ matrix.build_type.name }}.appimage
 
       - name: Upload artifact
-        id: upload_pulseview_${{ env.TARGET }}_${{ env.BUILD_TYPE }}_appimage_artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-appimage
@@ -471,7 +468,6 @@ jobs:
           mv sigrok-cli-*.AppImage sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug.appimage
 
       - name: Upload artifact
-        id: upload_sigrok-cli_${{ env.TARGET }}_appimage_artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-sigrok-cli-${{ matrix.target.target }}-appimage
@@ -581,7 +577,6 @@ jobs:
           ./sigrok-macos-create-dmg.sh
 
       - name: Upload artifact
-        id: upload_pulseview_dmg_artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-pulseview-macos
@@ -669,7 +664,6 @@ jobs:
           ./sigrok-macos-create-dmg.sh
 
       - name: Upload artifact
-        id: upload_sigrok-cli_dmg_artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-sigrok-cli-macos
@@ -703,7 +697,6 @@ jobs:
       - name: Inspect directory after downloading artifacts
         run: ls -alFR
       - name: Create release
-        id: create_release
         uses: softprops/action-gh-release@v1
         with:
           files: |
@@ -741,7 +734,6 @@ jobs:
       - name: Inspect directory after downloading artifacts
         run: ls -alFR
       - name: Create release
-        id: create_release
         uses: softprops/action-gh-release@v1
         with:
           files: |
