@@ -141,7 +141,7 @@ jobs:
         # Only relevant for pull requests
         if: (github.event_name == 'pull_request')
         run: |
-          echo "PR_LINKS=$PR_LINKS | pulseview-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-${{ matrix.build_type.name }}-installer.exe | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_OUTPUT
+          echo "PR_LINKS=\" | pulseview-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-${{ matrix.build_type.name }}-installer.exe | ${{ steps.upload.outputs.artifact-url }}\"" >> $GITHUB_OUTPUT
 
 
   build_sigrok-cli_mxe:
@@ -244,7 +244,7 @@ jobs:
         # Only relevant for pull requests
         if: (github.event_name == 'pull_request')
         run: |
-          echo "PR_LINKS=$PR_LINKS | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug-installer.exe | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_OUTPUT
+          echo "PR_LINKS=\" | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug-installer.exe | ${{ steps.upload.outputs.artifact-url }}\"" >> $GITHUB_OUTPUT
 
 
   build_pulseview_appimage:
@@ -374,7 +374,7 @@ jobs:
         # Only relevant for pull requests
         if: (github.event_name == 'pull_request')
         run: |
-          echo "PR_LINKS=$PR_LINKS | pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-appimage | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_OUTPUT
+          echo "PR_LINKS=\" | pulseview-${{ matrix.target.target }}-${{ matrix.build_type.name }}-appimage | ${{ steps.upload.outputs.artifact-url }}\"" >> $GITHUB_OUTPUT
 
 
   build_sigrok-cli_appimage:
@@ -497,7 +497,7 @@ jobs:
         # Only relevant for pull requests
         if: (github.event_name == 'pull_request')
         run: |
-          echo "PR_LINKS=$PR_LINKS | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug.appimage | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_OUTPUT
+          echo "PR_LINKS=\" | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug.appimage | ${{ steps.upload.outputs.artifact-url }}\"" >> $GITHUB_OUTPUT
 
 
   build_pulseview_macos:
@@ -605,7 +605,7 @@ jobs:
         # Only relevant for pull requests
         if: (github.event_name == 'pull_request')
         run: |
-          echo "PR_LINKS=$PR_LINKS | pulseview-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_OUTPUT
+          echo "PR_LINKS=\" | pulseview-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg | ${{ steps.upload.outputs.artifact-url }}\"" >> $GITHUB_OUTPUT
 
 
   build_sigrok-cli_macos:
@@ -697,7 +697,7 @@ jobs:
         # Only relevant for pull requests
         if: (github.event_name == 'pull_request')
         run: |
-          echo "PR_LINKS=$PR_LINKS | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg | ${{ steps.upload.outputs.artifact-url }}" >> $GITHUB_OUTPUT
+          echo "PR_LINKS=\" | sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg | ${{ steps.upload.outputs.artifact-url }}\"" >> $GITHUB_OUTPUT
 
 
   continuous_release_pulseview:
