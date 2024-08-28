@@ -62,7 +62,7 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     outputs:
-      pr-links: ${{ steps.pr_links.outputs.PR_LINKS }}
+      pr_links: ${{ steps.pr_links.outputs.PR_LINKS }}
 
     steps:
       - name: Set artifact version to PR
@@ -170,7 +170,7 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     outputs:
-      pr-links: ${{ steps.pr_links.outputs.PR_LINKS }}
+      pr_links: ${{ steps.pr_links.outputs.PR_LINKS }}
 
     steps:
       - name: Set artifact version to PR
@@ -292,7 +292,7 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     outputs:
-      pr-links: ${{ steps.pr_links.outputs.PR_LINKS }}
+      pr_links: ${{ steps.pr_links.outputs.PR_LINKS }}
 
     steps:
       - name: Set artifact version to PR
@@ -418,7 +418,7 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     outputs:
-      pr-links: ${{ steps.pr_links.outputs.PR_LINKS }}
+      pr_links: ${{ steps.pr_links.outputs.PR_LINKS }}
 
     steps:
       - name: Set artifact version to PR
@@ -526,7 +526,7 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     outputs:
-      pr-links: ${{ steps.pr_links.outputs.PR_LINKS }}
+      pr_links: ${{ steps.pr_links.outputs.PR_LINKS }}
 
     steps:
       - name: Set artifact version to PR
@@ -627,7 +627,7 @@ jobs:
       ARTIFACT_VERSION: "NIGHTLY"
 
     outputs:
-      pr-links: ${{ steps.pr_links.outputs.PR_LINKS }}
+      pr_links: ${{ steps.pr_links.outputs.PR_LINKS }}
 
     steps:
       - name: Set artifact version to PR
