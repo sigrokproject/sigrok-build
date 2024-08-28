@@ -814,7 +814,9 @@ jobs:
 
             | Build | Link |
             | ----- | ---- |
-            ${{ needs.*.outputs.pr_links }}
+            ${{ needs.build_pulseview_appimage.outputs.pr_links }}
+            ${{ needs.build_pulseview_mxe.outputs.pr_links }}
+            ${{ needs.build_pulseview_macos.outputs.pr_links }}
 
             Note: Binaries are removed after 90 days. If necessary, re-trigger a build by commenting '/build'.
         with:
@@ -849,7 +851,9 @@ jobs:
 
             | Build | Link |
             | ----- | ---- |
-            ${{ needs.*.outputs.pr_links }}
+            ${{ needs.build_sigrok-cli_appimage.outputs.pr_links }}
+            ${{ needs.build_sigrok-cli_mxe.outputs.pr_links }}
+            ${{ needs.build_sigrok-cli_macos.outputs.pr_links }}
 
             Note: Binaries are removed after 90 days. If necessary, re-trigger a build by commenting '/build'.
         with:
