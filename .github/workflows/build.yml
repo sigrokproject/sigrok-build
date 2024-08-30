@@ -500,8 +500,117 @@ jobs:
           echo "PR_LINKS=[sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ matrix.target.target }}-debug.appimage](${{ steps.upload.outputs.artifact-url }})" >> $GITHUB_OUTPUT
 
 
-  build_pulseview_macos:
-    name: PulseView macOS build
+  build_pulseview_macos_arm:
+    name: PulseView macOS build for ARM
+
+    if: |
+      ((endsWith(github.repository, 'pulseview')) ||
+      (endsWith(github.repository, 'sigrok-build')))
+
+    # See https://github.com/actions/runner-images/issues/9254
+    runs-on: macos-14
+
+# Note: For now, we only supply debug builds
+#    strategy:
+#      matrix:
+#        build_type:
+#          - { type: "Release", name: "release" }
+#          - { type: "Debug", name: "debug" }
+
+    env:
+      TARGET: "arm"
+      BREW_PYTHON_VERSION: "python@3"
+      BREW_QT_VERSION: "qt"
+      # Artifact infos
+      ARTIFACT_TITLE: "pulseview"
+      ARTIFACT_BIN_NAME: "pulseview"
+      ARTIFACT_VERSION: "NIGHTLY"
+
+    outputs:
+      pr_links: ${{ steps.pr_links.outputs.PR_LINKS }}
+
+    steps:
+      - name: Set artifact version to PR
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "ARTIFACT_VERSION=pr${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          brew install autoconf automake autoconf-archive pkg-config libtool \
+          libzip libusb libftdi hidapi nettle check doxygen swig \
+          glib glibmm@2.66 cmake boost sdcc $BREW_PYTHON_VERSION $BREW_QT_VERSION
+
+#      - name: Provide qt also in prefix directory as qt is using a keg
+#        run: |
+#          brew link -f $BREW_QT_VERSION
+
+      - name: Checkout sigrok-build
+        # Cannot use actions/checkout because it always checks out the calling actions' repo, not the one specified
+        run: |
+          git clone https://github.com/sigrokproject/sigrok-build.git
+
+      - name: Build dependencies
+        run: |
+          cd sigrok-build/ci/macos
+          source sigrok-macos-init-toolchain.sh
+          ./sigrok-macos-build-dependencies.sh
+
+      - name: Checkout sigrok's PulseView
+        # Check out default PV repository unless we're processing a pull request
+        uses: actions/checkout@v4
+        with:
+          # TODO: Clone from sigrok.org
+          repository: sigrokproject/pulseview
+          path: pulseview
+
+      - name: Checkout PulseView from PR
+        # Check out PV branch of the pull request we're processing
+        if: (github.event_name == 'pull_request')
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          path: pulseview
+          fetch-depth: 0
+
+      - name: Build PulseView
+        run: |
+          source sigrok-build/ci/macos/sigrok-macos-init-toolchain.sh
+          mkdir -p pulseview/build
+          cd pulseview/build
+          PKG_CONFIG_PATH=$P cmake \
+            -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_DIR \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DDISABLE_WERROR=FALSE \
+            -DENABLE_TESTS=FALSE \
+            ..
+          make $PARALLEL $V
+          make install $V
+
+      - name: Build DMG
+        run: |
+          cd sigrok-build/ci/macos
+          source sigrok-macos-init-toolchain.sh
+          ./sigrok-macos-create-dmg.sh
+
+      - name: Upload artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-pulseview-arm-macos
+          path: sigrok-build/ci/macos/pulseview*.dmg
+
+      - name: Add artifact to pull request message
+        id: pr_links
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "PR_LINKS=[pulseview-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg](${{ steps.upload.outputs.artifact-url }})" >> $GITHUB_OUTPUT
+
+
+  build_pulseview_macos_x86:
+    name: PulseView macOS build for x86
 
     if: |
       ((endsWith(github.repository, 'pulseview')) ||
@@ -597,7 +706,7 @@ jobs:
         id: upload
         uses: actions/upload-artifact@v4
         with:
-          name: artifact-pulseview-macos
+          name: artifact-pulseview-x86-macos
           path: sigrok-build/ci/macos/pulseview*.dmg
 
       - name: Add artifact to pull request message
@@ -608,8 +717,101 @@ jobs:
           echo "PR_LINKS=[pulseview-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg](${{ steps.upload.outputs.artifact-url }})" >> $GITHUB_OUTPUT
 
 
-  build_sigrok-cli_macos:
-    name: sigrok-cli macOS build
+  build_sigrok-cli_macos_arm:
+    name: sigrok-cli macOS build for ARM
+
+    if: |
+      ((endsWith(github.repository, 'sigrok-cli')) ||
+      (endsWith(github.repository, 'sigrok-build')))
+
+    # See https://github.com/actions/runner-images/issues/9254
+    runs-on: macos-14
+
+    env:
+      TARGET: "arm"
+      BREW_QT_VERSION: "qt"
+      BREW_PYTHON_VERSION: "python@3"
+      # Artifact infos
+      ARTIFACT_TITLE: "sigrok-cli"
+      ARTIFACT_BIN_NAME: "sigrok-cli"
+      ARTIFACT_VERSION: "NIGHTLY"
+
+    outputs:
+      pr_links: ${{ steps.pr_links.outputs.PR_LINKS }}
+
+    steps:
+      - name: Set artifact version to PR
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "ARTIFACT_VERSION=pr${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          brew install autoconf automake autoconf-archive pkg-config sdcc \
+            libtool libzip libusb libftdi hidapi nettle check doxygen swig \
+            glib "$BREW_PYTHON_VERSION" "$BREW_QT_VERSION"
+
+      - name: Checkout sigrok-build
+        # Cannot use actions/checkout because it always checks out the calling actions' repo, not the one specified
+        run: |
+          git clone https://github.com/sigrokproject/sigrok-build.git
+
+      - name: Build dependencies
+        run: |
+          cd sigrok-build/ci/macos
+          source sigrok-macos-init-toolchain.sh
+          ./sigrok-macos-build-dependencies.sh
+
+      - name: Checkout sigrok's sigrok-cli
+        # Check out default sigrok-cli repository unless we're processing a pull request
+        if: (github.event_name != 'pull_request')
+        uses: actions/checkout@v4
+        with:
+          repository: sigrokproject/sigrok-cli
+          path: sigrok-cli
+
+      - name: Checkout sigrok-cli from PR
+        # Check out sigrok-cli branch of the pull request we're processing
+        if: (github.event_name == 'pull_request')
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          path: sigrok-cli
+          fetch-depth: 0
+
+      - name: Build sigrok-cli
+        run: |
+          source sigrok-build/ci/macos/sigrok-macos-init-toolchain.sh
+          cd sigrok-cli
+          ./autogen.sh
+          PKG_CONFIG_PATH=$P ./configure $C
+          make $PARALLEL $V
+          make install $V
+
+      - name: Build DMG
+        run: |
+          cd sigrok-build/ci/macos
+          source sigrok-macos-init-toolchain.sh
+          ./sigrok-macos-create-dmg.sh
+
+      - name: Upload artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-sigrok-cli-arm-macos
+          path: sigrok-build/ci/macos/sigrok-cli*.dmg
+
+      - name: Add artifact to pull request message
+        id: pr_links
+        # Only relevant for pull requests
+        if: (github.event_name == 'pull_request')
+        run: |
+          echo "PR_LINKS=[sigrok-cli-${{ env.ARTIFACT_VERSION }}-${{ env.TARGET }}.dmg](${{ steps.upload.outputs.artifact-url }})" >> $GITHUB_OUTPUT
+
+
+  build_sigrok-cli_macos_x86:
+    name: sigrok-cli macOS build for x86
 
     if: |
       ((endsWith(github.repository, 'sigrok-cli')) ||
@@ -689,7 +891,7 @@ jobs:
         id: upload
         uses: actions/upload-artifact@v4
         with:
-          name: artifact-sigrok-cli-macos
+          name: artifact-sigrok-cli-x86-macos
           path: sigrok-build/ci/macos/sigrok-cli*.dmg
 
       - name: Add artifact to pull request message
@@ -714,7 +916,8 @@ jobs:
       # Keep in sync with job announce_pv_builds_in_pr
       - build_pulseview_mxe
       - build_pulseview_appimage
-      - build_pulseview_macos
+      - build_pulseview_macos_x86
+      - build_pulseview_macos_arm
 
     steps:
       - name: Download all other artifacts
@@ -731,7 +934,8 @@ jobs:
             artifact-pulseview-x86_64-release-mxe/pulseview-*
             artifact-pulseview-x86_64-debug-appimage/pulseview-*
             artifact-pulseview-x86_64-release-appimage/pulseview-*
-            artifact-pulseview-macos/pulseview-*
+            artifact-pulseview-x86-macos/pulseview-*
+            artifact-pulseview-arm-macos/pulseview-*
           tag_name: continuous
           generate_release_notes: false
           draft: false
@@ -752,7 +956,8 @@ jobs:
       # Keep in sync with job announce_sigrok-cli_builds_in_pr
       - build_sigrok-cli_mxe
       - build_sigrok-cli_appimage
-      - build_sigrok-cli_macos
+      - build_sigrok-cli_macos_x86
+      - build_sigrok-cli_macos_arm
 
     steps:
       - name: Download all other artifacts
@@ -766,7 +971,8 @@ jobs:
             artifact-sigrok-cli-i686-mxe/sigrok-cli-*
             artifact-sigrok-cli-x86_64-mxe/sigrok-cli-*
             artifact-sigrok-cli-x86_64-appimage/sigrok-cli-*
-            artifact-sigrok-cli-macos/sigrok-cli-*
+            artifact-sigrok-cli-x86-macos/sigrok-cli-*
+            artifact-sigrok-cli-arm-macos/sigrok-cli-*
           tag_name: continuous
           generate_release_notes: false
           draft: false
@@ -803,7 +1009,8 @@ jobs:
       # Keep in sync with job continuous_release_pulseview
       - build_pulseview_mxe
       - build_pulseview_appimage
-      - build_pulseview_macos
+      - build_pulseview_macos_x86
+      - build_pulseview_macos_arm
 
     steps:
       - name: Post comment to PR
@@ -813,7 +1020,8 @@ jobs:
             ## PulseView binaries created
             ${{ needs.build_pulseview_appimage.outputs.pr_links }}
             ${{ needs.build_pulseview_mxe.outputs.pr_links }}
-            ${{ needs.build_pulseview_macos.outputs.pr_links }}
+            ${{ needs.build_pulseview_macos_x86.outputs.pr_links }}
+            ${{ needs.build_pulseview_macos_arm.outputs.pr_links }}
 
             Note: Binaries are removed after 90 days. If necessary, re-trigger a build by commenting '/build'.
         with:
@@ -837,7 +1045,8 @@ jobs:
       # Keep in sync with job continuous_release_sigrok-cli
       - build_sigrok-cli_mxe
       - build_sigrok-cli_appimage
-      - build_sigrok-cli_macos
+      - build_sigrok-cli_macos_x86
+      - build_sigrok-cli_macos_arm
 
     steps:
       - name: Post comment to PR
@@ -847,7 +1056,8 @@ jobs:
             ## sigrok-cli binaries created
             ${{ needs.build_sigrok-cli_appimage.outputs.pr_links }}
             ${{ needs.build_sigrok-cli_mxe.outputs.pr_links }}
-            ${{ needs.build_sigrok-cli_macos.outputs.pr_links }}
+            ${{ needs.build_sigrok-cli_macos_x86.outputs.pr_links }}
+            ${{ needs.build_sigrok-cli_macos_arm.outputs.pr_links }}
 
             Note: Binaries are removed after 90 days. If necessary, re-trigger a build by commenting '/build'.
         with:
