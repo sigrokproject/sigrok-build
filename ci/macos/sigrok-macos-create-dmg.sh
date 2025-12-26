@@ -75,7 +75,9 @@ if [ "$ARTIFACT_BIN_NAME" = "pulseview" ]; then
 	# chmod 644 $FRAMEWORKS_DIR/*boost*
 
 	# Copy QtDBus framework files
-	cp -r $QT_DIR/Frameworks/QtDBus.framework $FRAMEWORKS_DIR/
+	cp -R $(readlink -f "$QT_DIR/Frameworks/QtDBus.framework") $FRAMEWORKS_DIR/
+	chmod -R o+w "$FRAMEWORKS_DIR/QtDBus.framework"
+	rm -rf "$FRAMEWORKS_DIR/QtDBus.framework/_CodeSignature"
 fi
 
 "$QT_BIN_DIR"/macdeployqt $ARTIFACT_TITLE.app
@@ -131,4 +133,3 @@ hdiutil create "${ARTIFACT_TITLE}-${ARTIFACT_VERSION}-${TARGET}.dmg" \
 
 # Move DMG to parent directory, so it is accessible without knowing $DMG_BUILD_DIR
 mv "${ARTIFACT_TITLE}-${ARTIFACT_VERSION}-${TARGET}.dmg" ..
-
