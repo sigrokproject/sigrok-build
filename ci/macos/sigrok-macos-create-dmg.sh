@@ -85,7 +85,9 @@ fi
 # Copy Python framework and fix it up.
 cp -R "$PYTHON_FRAMEWORK_DIR" $FRAMEWORKS_DIR
 chmod 644 "$PYTHON_DIR"/lib/libpython*.dylib
-rm -rf "$PYTHON_DIR"/Headers
+# Keep the actual headers dir, just wipe contents, to avoid
+# dangling symlink/codesigning failures
+rm -rf "$PYTHON_DIR"/Headers/*
 rm -rf "$PYTHON_DIR"/bin
 rm -rf "$PYTHON_DIR"/include
 rm -rf "$PYTHON_DIR"/share
@@ -101,7 +103,10 @@ rm -rf "$PYTHON_DIR"/lib/python$PYTHON_VERSION/unittest
 rm -rf "$PYTHON_DIR"/lib/python$PYTHON_VERSION/__pycache__
 rm -rf "$PYTHON_DIR"/lib/python$PYTHON_VERSION/**/__pycache__
 rm -rf "$PYTHON_DIR"/lib/python$PYTHON_VERSION/**/**/__pycache__
-rm -rf "$PYTHON_DIR"/Resources
+rm -rf "$PYTHON_DIR"/lib/python$PYTHON_VERSION/site-packages
+# retain Info.plist to avoid codesigning failures
+rm -rf "$PYTHON_DIR"/Resources/Python.app
+rm -rf "$PYTHON_DIR"/_CodeSignature
 
 # Replace paths
 install_name_tool -change \
