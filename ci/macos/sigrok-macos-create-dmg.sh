@@ -132,6 +132,8 @@ xsltproc --stringparam VERSION "${ARTIFACT_VERSION}" -o $CONTENTS_DIR/Info.plist
 	../contrib-macos/Info-${ARTIFACT_BIN_NAME}.xslt ../contrib-macos/Info-${ARTIFACT_BIN_NAME}.plist
 cp ../contrib-macos/${ARTIFACT_BIN_NAME}.icns $CONTENTS_DIR/Resources
 
+codesign --force --deep --sign - "$ARTIFACT_TITLE.app"
+
 hdiutil create "${ARTIFACT_TITLE}-${ARTIFACT_VERSION}-${TARGET}.dmg" \
 	-volname "$ARTIFACT_TITLE $ARTIFACT_VERSION" \
 	-fs HFS+ -srcfolder "$ARTIFACT_TITLE.app"
