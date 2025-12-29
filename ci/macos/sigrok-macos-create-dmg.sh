@@ -109,6 +109,10 @@ rm -rf "$PYTHON_DIR"/Resources/Python.app
 rm -rf "$PYTHON_DIR"/_CodeSignature
 
 # Replace paths
+install_name_tool -id \
+	@executable_path/../Frameworks/Python.framework/Versions/$PYTHON_VERSION/Python \
+	"$PYTHON_DIR"/Python
+
 install_name_tool -change \
 	"$PYTHON_PREFIX_DIR"/Frameworks/Python.framework/Versions/$PYTHON_VERSION/Python \
 	@executable_path/../Frameworks/Python.framework/Versions/$PYTHON_VERSION/Python \
