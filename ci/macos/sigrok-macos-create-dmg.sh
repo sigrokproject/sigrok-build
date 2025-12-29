@@ -88,8 +88,6 @@ if [ "$ARTIFACT_BIN_NAME" = "pulseview" ]; then
 	rm -rf "$FRAMEWORKS_DIR/QtDBus.framework/_CodeSignature"
 fi
 
-"$QT_BIN_DIR"/macdeployqt $ARTIFACT_TITLE.app
-
 # Copy Python framework and fix it up.
 cp -R "$PYTHON_FRAMEWORK_DIR" $FRAMEWORKS_DIR
 chmod 644 "$PYTHON_DIR"/lib/libpython*.dylib
@@ -133,6 +131,8 @@ install_name_tool -change \
 install_name_tool -id \
 	@executable_path/../Frameworks/Python.framework/Versions/$PYTHON_VERSION/Python \
 	"$PYTHON_DIR"/Python
+
+"$QT_BIN_DIR"/macdeployqt $ARTIFACT_TITLE.app -libpath="$QT_DIR/lib"
 
 install_name_tool -change \
 	"$PYTHON_PREFIX_DIR"/Frameworks/Python.framework/Versions/$PYTHON_VERSION/Python \
