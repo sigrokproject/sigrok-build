@@ -616,7 +616,7 @@ jobs:
       ((endsWith(github.repository, 'pulseview')) ||
       (endsWith(github.repository, 'sigrok-build')))
 
-    runs-on: macos-13
+    runs-on: macos-15-intel
 
 # Note: For now, we only supply debug builds
 #    strategy:
@@ -817,7 +817,7 @@ jobs:
       ((endsWith(github.repository, 'sigrok-cli')) ||
       (endsWith(github.repository, 'sigrok-build')))
 
-    runs-on: macos-13
+    runs-on: macos-15-intel
 
     env:
       TARGET: "x86"
