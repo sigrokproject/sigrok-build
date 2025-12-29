@@ -42,6 +42,10 @@ PYTHON_PREFIX_DIR=$(brew --prefix "$BREW_PYTHON_VERSION")
 # Get Python version
 PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[0:2])))')
 
+DBUS_DYLIB_PATH=$(brew list dbus | grep dylib | sort -n | head -n 1)
+DBUS_PREFIX=$(brew --prefix dbus)
+DBUS_DYLIB=$(basename "$DBUS_DYLIB_PATH")
+
 DMG_BUILD_DIR=./build_dmg
 mkdir $DMG_BUILD_DIR
 cd $DMG_BUILD_DIR
@@ -73,6 +77,10 @@ if [ "$ARTIFACT_BIN_NAME" = "pulseview" ]; then
 	# cp $BOOSTLIBDIR/libboost_timer-mt.dylib $FRAMEWORKS_DIR
 	# cp $BOOSTLIBDIR/libboost_chrono-mt.dylib $FRAMEWORKS_DIR
 	# chmod 644 $FRAMEWORKS_DIR/*boost*
+
+	# Copy libdbus into bundle
+	cp "$DBUS_DYLIB_PATH" $FRAMEWORKS_DIR/
+	chmod 644 "$FRAMEWORKS_DIR/$DBUS_DYLIB"
 
 	# Copy QtDBus framework files
 	cp -R $(readlink -f "$QT_DIR/Frameworks/QtDBus.framework") $FRAMEWORKS_DIR/
@@ -109,6 +117,19 @@ rm -rf "$PYTHON_DIR"/Resources/Python.app
 rm -rf "$PYTHON_DIR"/_CodeSignature
 
 # Replace paths
+install_name_tool -id \
+	"@executable_path/../Frameworks/$DBUS_DYLIB" \
+	"$FRAMEWORKS_DIR/$DBUS_DYLIB"
+
+install_name_tool -id \
+	@executable_path/../Frameworks/QtDBus.framework/Versions/A/QtDBus \
+	"$FRAMEWORKS_DIR/QtDBus.framework/Versions/A/QtDBus"
+
+install_name_tool -change \
+    "$DBUS_PREFIX/lib/$DBUS_DYLIB" \
+	"@executable_path/../Frameworks/$DBUS_DYLIB" \
+	"$FRAMEWORKS_DIR/QtDBus.framework/Versions/A/QtDBus"
+
 install_name_tool -id \
 	@executable_path/../Frameworks/Python.framework/Versions/$PYTHON_VERSION/Python \
 	"$PYTHON_DIR"/Python
