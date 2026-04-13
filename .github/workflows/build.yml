@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ghcr.io/sigrokproject/sigrok-mxe:latest
+      image: ghcr.io/${{ github.repository_owner }}/sigrok-mxe:latest
 
     strategy:
       matrix:
@@ -83,7 +83,7 @@ jobs:
 
       - name: Checkout sigrok's PulseView
         # Check out default PV repository unless we're processing a pull request
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           # TODO: Clone from sigrok.org
           repository: sigrokproject/pulseview
@@ -92,7 +92,7 @@ jobs:
       - name: Checkout PulseView from PR
         # Check out PV branch of the pull request we're processing
         if: (github.event_name == 'pull_request')
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
@@ -154,7 +154,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ghcr.io/sigrokproject/sigrok-mxe:latest
+      image: ghcr.io/${{ github.repository_owner }}/sigrok-mxe:latest
 
     strategy:
       matrix:
@@ -192,7 +192,7 @@ jobs:
       - name: Checkout sigrok's sigrok-cli
         # Check out default sigrok-cli repository unless we're processing a pull request
         if: (github.event_name != 'pull_request')
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           repository: sigrokproject/sigrok-cli
           path: sigrok-cli
@@ -200,7 +200,7 @@ jobs:
       - name: Checkout sigrok-cli from PR
         # Check out sigrok-cli branch of the pull request we're processing
         if: (github.event_name == 'pull_request')
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
@@ -257,7 +257,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ghcr.io/sigrokproject/sigrok-appimage-${{ matrix.target.container }}:latest
+      image: ghcr.io/${{ github.repository_owner }}/sigrok-appimage-${{ matrix.target.container }}:latest
 
     strategy:
       matrix:
@@ -320,7 +320,7 @@ jobs:
 
       - name: Checkout sigrok's PulseView
         # Check out default PV repository unless we're processing a pull request
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           # TODO: Clone from sigrok.org
           repository: sigrokproject/pulseview
@@ -329,7 +329,7 @@ jobs:
       - name: Checkout PulseView from PR
         # Check out PV branch of the pull request we're processing
         if: (github.event_name == 'pull_request')
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
@@ -387,7 +387,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ghcr.io/sigrokproject/sigrok-appimage-${{ matrix.target.container }}:latest
+      image: ghcr.io/${{ github.repository_owner }}/sigrok-appimage-${{ matrix.target.container }}:latest
 
     strategy:
       matrix:
@@ -449,7 +449,7 @@ jobs:
       - name: Checkout sigrok's sigrok-cli
         # Check out default sigrok-cli repository unless we're processing a pull request
         if: (github.event_name != 'pull_request')
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           repository: sigrokproject/sigrok-cli
           path: sigrok-cli
@@ -457,7 +457,7 @@ jobs:
       - name: Checkout sigrok-cli from PR
         # Check out sigrok-cli branch of the pull request we're processing
         if: (github.event_name == 'pull_request')
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
@@ -558,7 +558,7 @@ jobs:
 
       - name: Checkout sigrok's PulseView
         # Check out default PV repository unless we're processing a pull request
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           # TODO: Clone from sigrok.org
           repository: sigrokproject/pulseview
@@ -567,7 +567,7 @@ jobs:
       - name: Checkout PulseView from PR
         # Check out PV branch of the pull request we're processing
         if: (github.event_name == 'pull_request')
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
@@ -666,7 +666,7 @@ jobs:
 
       - name: Checkout sigrok's PulseView
         # Check out default PV repository unless we're processing a pull request
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           # TODO: Clone from sigrok.org
           repository: sigrokproject/pulseview
@@ -675,7 +675,7 @@ jobs:
       - name: Checkout PulseView from PR
         # Check out PV branch of the pull request we're processing
         if: (github.event_name == 'pull_request')
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
@@ -765,7 +765,7 @@ jobs:
       - name: Checkout sigrok's sigrok-cli
         # Check out default sigrok-cli repository unless we're processing a pull request
         if: (github.event_name != 'pull_request')
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           repository: sigrokproject/sigrok-cli
           path: sigrok-cli
@@ -773,7 +773,7 @@ jobs:
       - name: Checkout sigrok-cli from PR
         # Check out sigrok-cli branch of the pull request we're processing
         if: (github.event_name == 'pull_request')
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
@@ -857,7 +857,7 @@ jobs:
       - name: Checkout sigrok's sigrok-cli
         # Check out default sigrok-cli repository unless we're processing a pull request
         if: (github.event_name != 'pull_request')
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           repository: sigrokproject/sigrok-cli
           path: sigrok-cli
@@ -865,7 +865,7 @@ jobs:
       - name: Checkout sigrok-cli from PR
         # Check out sigrok-cli branch of the pull request we're processing
         if: (github.event_name == 'pull_request')
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
