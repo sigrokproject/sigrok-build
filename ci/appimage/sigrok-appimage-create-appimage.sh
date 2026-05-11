@@ -25,7 +25,7 @@ cat > "$INSTALL_DIR"/AppRun.sh << EOF
 #! /bin/bash
 
 export PYTHONHOME="\$APPDIR"/usr/share/pyshared
-export PYTHONPATH="\$APPDIR"/usr/share/pyshared
+export PYTHONPATH="\$APPDIR"/usr/share/pyshared:"\$APPDIR"/usr/share/pyshared/lib-dynload
 export SIGROK_FIRMWARE_PATH="\$SIGROK_FIRMWARE_PATH":"\$APPDIR"/usr/share/sigrok-firmware
 export SIGROKDECODE_PATH="\$SIGROKDECODE_PATH":"\$APPDIR"/usr/share/libsigrokdecode/decoders
 
@@ -41,7 +41,8 @@ cp -r "$INSTALL_DIR"/share/sigrok-firmware "$APP_DIR"/usr/share
 
 # Copy extra Python files
 mkdir -p "$APP_DIR"/usr/share/pyshared
-cp -r /usr/lib/python3.8/* "$APP_DIR"/usr/share/pyshared
+PYTHON_STDLIB_DIR=$(python3 -c 'import sysconfig; print(sysconfig.get_path("stdlib"))')
+cp -r "$PYTHON_STDLIB_DIR"/* "$APP_DIR"/usr/share/pyshared
 
 # AppImage build dir
 mkdir -p appimage-build

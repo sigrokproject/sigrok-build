@@ -4,9 +4,11 @@
 # Use "export GH_USER=..." to set your github user
 # See https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
 
+# Force shell to fail on almost everyting
+set -euox pipefail
+
 cd docker
-docker build --progress=plain -f sigrok-mxe.Dockerfile -t sigrok-mxe . && \
-	echo $CR_PAT | docker login ghcr.io -u $GH_USER --password-stdin && \
-	docker tag sigrok-mxe:latest ghcr.io/$GH_USER/sigrok-mxe:latest && \
-	docker push ghcr.io/$GH_USER/sigrok-mxe:latest
-cd ..
+docker build --progress=plain -f sigrok-mxe.Dockerfile -t sigrok-mxe .
+echo $CR_PAT | docker login ghcr.io -u $GH_USER --password-stdin
+docker tag sigrok-mxe:latest ghcr.io/$GH_USER/sigrok-mxe:latest
+docker push ghcr.io/$GH_USER/sigrok-mxe:latest

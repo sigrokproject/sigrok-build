@@ -1,4 +1,4 @@
-FROM debian:latest AS sigrok-mxe
+FROM debian:bookworm AS sigrok-mxe
 LABEL \
 	org.opencontainers.image.title="sigrok MXE Build Image" \	
 	org.opencontainers.image.description="This image is used to cross compile the sigrok artifacts for Windows with MXE" \
@@ -8,10 +8,10 @@ LABEL \
 	org.opencontainers.image.authors="Soeren Apel <sigrok@apelpie.net>, Frank Stettner <frank-stettner@gmx.net>" \
 	maintainer="Soeren Apel <sigrok@apelpie.net>"
 
-ENV BASE_DIR /opt
-ENV MXE_DIR $BASE_DIR/mxe
-ENV MXE_TARGETS "i686-w64-mingw32.static.posix x86_64-w64-mingw32.static.posix"
-ENV MXE_PLUGIN_DIRS plugins/examples/qt5-freeze
+ENV BASE_DIR=/opt
+ENV MXE_DIR=$BASE_DIR/mxe
+ENV MXE_TARGETS="i686-w64-mingw32.static.posix x86_64-w64-mingw32.static.posix"
+ENV MXE_PLUGIN_DIRS=plugins/examples/qt5-freeze
 
 RUN apt-get update \
 	&& apt-get upgrade -y \
